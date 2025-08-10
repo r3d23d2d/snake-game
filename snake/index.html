@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Змейка</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="hud">
+        <div class="title">Змейка</div>
+        <div class="scores">
+          <div>Счёт: <span id="score">0</span></div>
+          <div>Рекорд: <span id="highScore">0</span></div>
+        </div>
+      </header>
+
+      <div class="board-wrap">
+        <canvas id="game" width="480" height="480" aria-label="Поле игры" role="img"></canvas>
+
+        <div id="overlay" class="overlay hidden" aria-live="polite">
+          <div class="overlay-card">
+            <h2 id="overlayTitle">Пауза</h2>
+            <p id="overlaySubtitle">Нажмите Пробел, чтобы продолжить</p>
+            <button id="restartBtn" class="primary hidden">Играть ещё раз</button>
+            <div class="help">
+              Управление: стрелки или WASD • Пауза: Пробел • Перезапуск: R
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="controls" aria-label="Кнопки управления для тач-устройств">
+        <div class="dpad">
+          <button data-dir="up" aria-label="Вверх">▲</button>
+          <div class="h-row">
+            <button data-dir="left" aria-label="Влево">◀</button>
+            <button data-dir="down" aria-label="Вниз">▼</button>
+            <button data-dir="right" aria-label="Вправо">▶</button>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
