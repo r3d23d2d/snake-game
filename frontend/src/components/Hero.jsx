@@ -22,7 +22,7 @@ const Hero = ({ data, onOpenForm }) => {
       </div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-4 pb-12 lg:pb-24">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-12 items-start lg:items-end">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-12 items-start lg:items-end h-full">
           {/* Left content */}
           <div className="space-y-8 lg:space-y-8 animate-fade-in-up pb-8 lg:pb-8">
             <div className="space-y-6 lg:space-y-6">
