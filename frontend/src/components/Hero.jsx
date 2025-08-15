@@ -91,13 +91,13 @@ const Hero = ({ data, onOpenForm }) => {
           </div>
 
           {/* Right content - Large professional photo */}
-          <div className="relative animate-fade-in-right delay-400 flex justify-center lg:justify-end lg:pb-0">
-            <div className="relative group lg:mt-12 lg:mb-0">
+          <div className="relative animate-fade-in-right delay-400 flex justify-center lg:justify-end lg:pb-0 lg:items-end lg:self-end">
+            <div className="relative group lg:mt-12 lg:mb-0 lg:self-end">
               {/* Main photo - no container, just the image */}
               <img 
                 src="https://customer-assets.emergentagent.com/job_stoma-marketing/artifacts/v1ephl0u_IMG_3307-no-bg-HD%20%28carve.photos%29.png"
                 alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
-                className="w-[480px] h-[700px] lg:w-[600px] lg:h-[800px] object-contain transition-all duration-500 group-hover:scale-105"
+                className="w-[480px] h-[700px] lg:w-[600px] lg:h-[800px] object-cover object-bottom transition-all duration-500 group-hover:scale-105"
               />
               
               {/* Floating elements */}
