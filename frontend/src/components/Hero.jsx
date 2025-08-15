@@ -94,13 +94,13 @@ const Hero = ({ data, onOpenForm }) => {
           <div className="relative animate-fade-in-right delay-400 flex justify-center lg:justify-end">
             <div className="relative group">
               {/* Main photo */}
-              <div className="w-80 h-96 lg:w-96 lg:h-[500px] relative overflow-hidden rounded-3xl shadow-2xl group-hover:shadow-3xl transition-all duration-500">
+              <div className="w-80 h-[520px] lg:w-96 lg:h-[600px] relative overflow-hidden rounded-3xl shadow-2xl group-hover:shadow-3xl transition-all duration-500">
                 <img 
                   src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
                   alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
-                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                  className="w-full h-full object-contain bg-gradient-to-br from-cyan-50 to-sky-100 transition-all duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-cyan-600/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-cyan-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 
                 {/* Floating elements */}
                 <div className="absolute top-4 right-4 bg-green-500 text-white text-sm px-3 py-1 rounded-full shadow-lg animate-pulse">
