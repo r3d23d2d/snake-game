@@ -138,7 +138,7 @@ export const siteData = {
       id: 3,
       title: "Работа по договору",
       description: "Официальное оформление как ИП, наличный и безналичный расчет",
-      icon: "Shield"
+      icon: "FileText"
     },
     {
       id: 4,
