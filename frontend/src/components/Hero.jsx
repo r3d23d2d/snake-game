@@ -97,7 +97,7 @@ const Hero = ({ data, onOpenForm }) => {
               <img 
                 src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
                 alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
-                className="w-96 h-[580px] lg:w-[450px] lg:h-[680px] object-contain transition-all duration-500 group-hover:scale-105"
+                className="w-[450px] h-[650px] lg:w-[550px] lg:h-[800px] object-contain transition-all duration-500 group-hover:scale-105"
               />
               
               {/* Floating elements */}
@@ -111,8 +111,8 @@ const Hero = ({ data, onOpenForm }) => {
               </div>
 
               {/* Decorative elements */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-cyan-200/50 rounded-full animate-float"></div>
-              <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-sky-300/50 rounded-full animate-float delay-1000"></div>
+              <div className="absolute -top-4 -right-4 w-28 h-28 bg-cyan-200/50 rounded-full animate-float"></div>
+              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-sky-300/50 rounded-full animate-float delay-1000"></div>
             </div>
           </div>
         </div>
