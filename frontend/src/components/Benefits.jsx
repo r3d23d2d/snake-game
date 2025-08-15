@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Award, FileText, Shield, Users, Star, CheckCircle } from 'lucide-react';
+import { Award, FileText, Users, Star } from 'lucide-react';
 
 const iconMap = {
   Award,
