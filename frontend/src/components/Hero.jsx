@@ -97,7 +97,7 @@ const Hero = ({ data, onOpenForm }) => {
               <img 
                 src="https://customer-assets.emergentagent.com/job_stoma-marketing/artifacts/v1ephl0u_IMG_3307-no-bg-HD%20%28carve.photos%29.png"
                 alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
-                className="w-[550px] h-[800px] lg:w-[750px] lg:h-[1000px] object-contain transition-all duration-500 group-hover:scale-105"
+                className="w-[480px] h-[700px] lg:w-[600px] lg:h-[800px] object-contain transition-all duration-500 group-hover:scale-105"
               />
               
               {/* Floating elements */}
