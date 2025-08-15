@@ -90,60 +90,33 @@ const Hero = ({ data, onOpenForm }) => {
             </div>
           </div>
 
-          {/* Right content - Visual element */}
-          <div className="relative animate-fade-in-right delay-400">
-            <Card className="p-8 bg-white/80 backdrop-blur-sm shadow-2xl border-0 hover:shadow-3xl transition-all duration-500 hover:-translate-y-2 relative overflow-hidden group">
-              {/* Card background animation */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/50 to-sky-100/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              <div className="space-y-6 relative z-10">
-                <div className="text-center">
-                  {/* Professional full-body photo */}
-                  <div className="w-40 h-48 mx-auto mb-4 relative group/avatar overflow-hidden rounded-2xl shadow-lg group-hover/avatar:shadow-2xl transition-all duration-500">
-                    <img 
-                      src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
-                      alt="Екатерина Егорова - Специалист по контекстной рекламе"
-                      className="w-full h-full object-cover transition-all duration-500 group-hover/avatar:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-cyan-600/20 via-transparent to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-500"></div>
-                    
-                    {/* Floating badge */}
-                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg animate-pulse">
-                      Online
-                    </div>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-cyan-700 transition-colors">
-                    Екатерина Егорова
-                  </h3>
-                  <p className="text-gray-600 group-hover:text-cyan-600 transition-colors">
-                    Специалист по контекстной рекламе для стоматологий
-                  </p>
+          {/* Right content - Large professional photo */}
+          <div className="relative animate-fade-in-right delay-400 flex justify-center lg:justify-end">
+            <div className="relative group">
+              {/* Main photo */}
+              <div className="w-80 h-96 lg:w-96 lg:h-[500px] relative overflow-hidden rounded-3xl shadow-2xl group-hover:shadow-3xl transition-all duration-500">
+                <img 
+                  src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
+                  alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
+                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-cyan-600/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                {/* Floating elements */}
+                <div className="absolute top-4 right-4 bg-green-500 text-white text-sm px-3 py-1 rounded-full shadow-lg animate-pulse">
+                  Online
                 </div>
                 
-                <div className="border-t pt-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg hover:shadow-md transition-all duration-300 hover:scale-105 group/item">
-                      <span className="text-gray-700 group-hover/item:text-emerald-700 transition-colors">Средняя стоимость заявки</span>
-                      <span className="font-bold text-green-600 group-hover/item:scale-110 transition-transform">от 350₽</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-cyan-50 to-sky-50 rounded-lg hover:shadow-md transition-all duration-300 hover:scale-105 group/item">
-                      <span className="text-gray-700 group-hover/item:text-cyan-700 transition-colors">Конверсия</span>
-                      <span className="font-bold text-cyan-600 group-hover/item:scale-110 transition-transform">8-12%</span>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg hover:shadow-md transition-all duration-300 hover:scale-105 group/item">
-                      <span className="text-gray-700 group-hover/item:text-purple-700 transition-colors">Срок запуска</span>
-                      <span className="font-bold text-purple-600 group-hover/item:scale-110 transition-transform">3-5 дней</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Trust indicator */}
-                <div className="flex items-center justify-center space-x-2 text-cyan-600 bg-cyan-50 rounded-lg p-3 group-hover:bg-cyan-100 transition-colors">
-                  <TrendingUp className="h-5 w-5 animate-bounce" />
-                  <span className="font-semibold text-sm">Результат гарантирован!</span>
+                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                  <div className="text-sm font-semibold text-gray-900">Екатерина Егорова</div>
+                  <div className="text-xs text-gray-600">6+ лет опыта</div>
                 </div>
               </div>
-            </Card>
+
+              {/* Decorative elements */}
+              <div className="absolute -top-4 -right-4 w-20 h-20 bg-cyan-200/50 rounded-full animate-float"></div>
+              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-sky-300/50 rounded-full animate-float delay-1000"></div>
+            </div>
           </div>
         </div>
       </div>
