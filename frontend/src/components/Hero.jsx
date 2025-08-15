@@ -98,8 +98,14 @@ const Hero = ({ data, onOpenForm }) => {
               
               <div className="space-y-6 relative z-10">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-100 to-sky-200 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
-                    <div className="w-8 h-8 bg-gradient-to-br from-cyan-600 to-sky-600 rounded-full animate-pulse"></div>
+                  {/* Professional photo */}
+                  <div className="w-24 h-24 mx-auto mb-4 relative group/avatar">
+                    <img 
+                      src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
+                      alt="Екатерина Егорова - Специалист по контекстной рекламе"
+                      className="w-full h-full object-cover rounded-full shadow-lg group-hover/avatar:shadow-xl transition-all duration-300 group-hover/avatar:scale-110 border-4 border-white group-hover/avatar:border-cyan-200"
+                    />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-600/10 to-sky-600/10 opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-cyan-700 transition-colors">
                     Екатерина Егорова
