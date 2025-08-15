@@ -111,8 +111,8 @@ const Hero = ({ data, onOpenForm }) => {
               </div>
 
               {/* Decorative elements */}
-              <div className="absolute -top-4 -right-4 w-36 h-36 bg-cyan-200/50 rounded-full animate-float"></div>
-              <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-sky-300/50 rounded-full animate-float delay-1000"></div>
+              <div className="absolute -top-4 -right-4 w-28 h-28 bg-cyan-200/50 rounded-full animate-float"></div>
+              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-sky-300/50 rounded-full animate-float delay-1000"></div>
             </div>
           </div>
         </div>
