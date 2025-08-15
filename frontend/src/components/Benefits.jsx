@@ -6,7 +6,6 @@ import { Award, FileText, Users, Star } from 'lucide-react';
 const iconMap = {
   Award,
   FileText,
-  Shield,
   Users
 };
 
