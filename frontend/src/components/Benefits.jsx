@@ -111,35 +111,7 @@ const Benefits = ({ data }) => {
           </div>
         </div>
 
-        {/* Guarantee section */}
-        <div className="mt-20 animate-fade-in-up">
-          <Card className="bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 border-2 border-green-200 hover:border-green-300 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group">
-            {/* Background animation */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-300/30 rounded-full translate-y-12 -translate-x-12 group-hover:scale-150 transition-transform duration-700 delay-200"></div>
-            
-            <CardContent className="p-8 text-center relative z-10">
-              <div className="max-w-3xl mx-auto">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                  <Shield className="h-8 w-8 text-green-600 group-hover:animate-bounce" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-700 transition-colors">
-                  Гарантия результата
-                </h3>
-                <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                  Если в первый месяц мы не получим заявки дешевле вашей текущей стоимости 
-                  (или если рекламы у вас нет — дешевле 800₽ за заявку), 
-                  я верну 100% стоимости услуг.
-                </p>
-                <div className="flex items-center justify-center space-x-3 text-green-600 font-semibold bg-white/50 rounded-lg p-4 group-hover:bg-white/70 transition-colors">
-                  <CheckCircle className="h-5 w-5 animate-pulse" />
-                  <span>Работаю по договору как ИП</span>
-                  <Shield className="h-5 w-5" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+
       </div>
     </section>
   );
