@@ -95,7 +95,7 @@ const Hero = ({ data, onOpenForm }) => {
             <div className="relative group">
               {/* Main photo - no container, just the image */}
               <img 
-                src="https://customer-assets.emergentagent.com/job_stoma-marketing/artifacts/0ranol2q_background_removed_image_DLIqFSnNSHyIjqfnLagxLg.png"
+                src="https://customer-assets.emergentagent.com/job_stoma-marketing/artifacts/v1ephl0u_IMG_3307-no-bg-HD%20%28carve.photos%29.png"
                 alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
                 className="w-[550px] h-[800px] lg:w-[750px] lg:h-[1000px] object-contain transition-all duration-500 group-hover:scale-105"
               />
