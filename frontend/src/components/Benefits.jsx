@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Award, FileText, Shield, Users } from 'lucide-react';
+import { Award, FileText, Shield, Users, Star, CheckCircle } from 'lucide-react';
 
 const iconMap = {
   Award,
@@ -11,39 +11,71 @@ const iconMap = {
 };
 
 const Benefits = ({ data }) => {
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-up');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const cards = sectionRef.current?.querySelectorAll('.benefit-card');
+    cards?.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="benefits" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <Badge className="bg-blue-100 text-blue-800 px-4 py-2 text-sm mb-4">
+    <section id="benefits" className="py-20 bg-gradient-to-br from-white via-cyan-25 to-sky-50 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-10 right-20 w-64 h-64 bg-cyan-200/20 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-500"></div>
+      <div className="absolute bottom-10 left-20 w-80 h-80 bg-sky-300/15 rounded-full mix-blend-multiply filter blur-xl animate-pulse delay-1000"></div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative" ref={sectionRef}>
+        <div className="text-center mb-16 animate-fade-in-up">
+          <Badge className="bg-gradient-to-r from-cyan-100 to-sky-100 text-cyan-800 px-4 py-2 text-sm mb-4 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105">
+            <Star className="w-4 h-4 mr-2 animate-spin-slow" />
             Почему выбирают меня
           </Badge>
-          <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl lg:text-5xl font-bold bg-gradient-to-r from-cyan-700 to-sky-700 bg-clip-text text-transparent mb-6">
             Мои преимущества
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             6+ лет я специализируюсь исключительно на продвижении стоматологий. 
             Знаю все нюансы ниши и гарантирую результат.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {data.map((benefit) => {
+          {data.map((benefit, index) => {
             const Icon = iconMap[benefit.icon];
             return (
-              <Card key={benefit.id} className="group hover:shadow-xl transition-all duration-300 border-0 shadow-lg hover:-translate-y-2">
-                <CardContent className="p-8 text-center">
+              <Card 
+                key={benefit.id} 
+                className="benefit-card group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg hover:-translate-y-3 relative overflow-hidden bg-white/90 backdrop-blur-sm"
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
+                {/* Card glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/5 to-sky-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <CardContent className="p-8 text-center relative z-10">
                   <div className="mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:from-blue-600 group-hover:to-indigo-600 transition-all duration-300">
-                      <Icon className="h-8 w-8 text-blue-600 group-hover:text-white transition-colors duration-300" />
+                    <div className="w-16 h-16 bg-gradient-to-br from-cyan-100 to-sky-200 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-gradient-to-br group-hover:from-cyan-600 group-hover:to-sky-600 transition-all duration-500 shadow-lg group-hover:shadow-xl group-hover:scale-110 group-hover:rotate-3">
+                      <Icon className="h-8 w-8 text-cyan-600 group-hover:text-white transition-all duration-500 group-hover:scale-110" />
                     </div>
                   </div>
                   
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-cyan-700 transition-colors duration-300">
                     {benefit.title}
                   </h3>
                   
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
                     {benefit.description}
                   </p>
                 </CardContent>
@@ -54,41 +86,55 @@ const Benefits = ({ data }) => {
 
         {/* Trust signals */}
         <div className="mt-20">
+          <h3 className="text-2xl font-bold text-center bg-gradient-to-r from-cyan-700 to-sky-700 bg-clip-text text-transparent mb-12">
+            Цифры, которые говорят сами за себя
+          </h3>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">50+</div>
-              <div className="text-gray-600">стоматологий работают со мной</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">6+</div>
-              <div className="text-gray-600">лет специализации в нише</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">95%</div>
-              <div className="text-gray-600">клиентов продлевают сотрудничество</div>
-            </div>
+            {[
+              { number: "50+", text: "стоматологий работают со мной", color: "from-cyan-600 to-sky-600", delay: "0ms" },
+              { number: "6+", text: "лет специализации в нише", color: "from-green-600 to-emerald-600", delay: "200ms" },
+              { number: "95%", text: "клиентов продлевают сотрудничество", color: "from-purple-600 to-violet-600", delay: "400ms" }
+            ].map((stat, index) => (
+              <div 
+                key={index}
+                className="text-center group animate-fade-in-up"
+                style={{ animationDelay: stat.delay }}
+              >
+                <div className={`text-5xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}>
+                  {stat.number}
+                </div>
+                <div className="text-gray-600 text-lg group-hover:text-cyan-600 transition-colors duration-300">
+                  {stat.text}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Guarantee section */}
-        <div className="mt-20">
-          <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200">
-            <CardContent className="p-8 text-center">
+        <div className="mt-20 animate-fade-in-up">
+          <Card className="bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 border-2 border-green-200 hover:border-green-300 transition-all duration-500 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden group">
+            {/* Background animation */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-300/30 rounded-full translate-y-12 -translate-x-12 group-hover:scale-150 transition-transform duration-700 delay-200"></div>
+            
+            <CardContent className="p-8 text-center relative z-10">
               <div className="max-w-3xl mx-auto">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Shield className="h-8 w-8 text-green-600" />
+                <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-200 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                  <Shield className="h-8 w-8 text-green-600 group-hover:animate-bounce" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-700 transition-colors">
                   Гарантия результата
                 </h3>
-                <p className="text-lg text-gray-700 mb-6">
+                <p className="text-lg text-gray-700 mb-6 leading-relaxed">
                   Если в первый месяц мы не получим заявки дешевле вашей текущей стоимости 
                   (или если рекламы у вас нет — дешевле 800₽ за заявку), 
                   я верну 100% стоимости услуг.
                 </p>
-                <div className="flex items-center justify-center space-x-2 text-green-600 font-semibold">
-                  <Shield className="h-5 w-5" />
+                <div className="flex items-center justify-center space-x-3 text-green-600 font-semibold bg-white/50 rounded-lg p-4 group-hover:bg-white/70 transition-colors">
+                  <CheckCircle className="h-5 w-5 animate-pulse" />
                   <span>Работаю по договору как ИП</span>
+                  <Shield className="h-5 w-5" />
                 </div>
               </div>
             </CardContent>
