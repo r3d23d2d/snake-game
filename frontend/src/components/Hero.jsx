@@ -91,8 +91,8 @@ const Hero = ({ data, onOpenForm }) => {
           </div>
 
           {/* Right content - Large professional photo */}
-          <div className="relative animate-fade-in-right delay-400 flex justify-center lg:justify-end">
-            <div className="relative group lg:mt-12">
+          <div className="relative animate-fade-in-right delay-400 flex justify-center lg:justify-end lg:pb-0">
+            <div className="relative group lg:mt-12 lg:mb-0">
               {/* Main photo - no container, just the image */}
               <img 
                 src="https://customer-assets.emergentagent.com/job_stoma-marketing/artifacts/v1ephl0u_IMG_3307-no-bg-HD%20%28carve.photos%29.png"
