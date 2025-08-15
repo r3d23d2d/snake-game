@@ -24,7 +24,7 @@ const Hero = ({ data, onOpenForm }) => {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-20 pb-8 lg:pb-4">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-12 items-end">
           {/* Left content */}
-          <div className="space-y-8 lg:space-y-8 animate-fade-in-up pb-8 lg:pb-8 flex flex-col justify-center">
+          <div className="space-y-8 lg:space-y-8 animate-fade-in-up pb-8 lg:pb-8 flex flex-col justify-center lg:-mt-8">
             <div className="space-y-6 lg:space-y-6">
               <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-cyan-100 to-sky-100 text-cyan-800 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all duration-300 group">
                 <Sparkles className="w-4 h-4 mr-2 animate-spin-slow" />
