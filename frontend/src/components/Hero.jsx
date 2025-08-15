@@ -93,24 +93,21 @@ const Hero = ({ data, onOpenForm }) => {
           {/* Right content - Large professional photo */}
           <div className="relative animate-fade-in-right delay-400 flex justify-center lg:justify-end">
             <div className="relative group">
-              {/* Main photo */}
-              <div className="w-96 h-[580px] lg:w-[450px] lg:h-[680px] relative overflow-hidden shadow-2xl group-hover:shadow-3xl transition-all duration-500">
-                <img 
-                  src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
-                  alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
-                  className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-cyan-600/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                {/* Floating elements */}
-                <div className="absolute top-4 right-4 bg-green-500 text-white text-sm px-3 py-1 rounded-full shadow-lg animate-pulse">
-                  Online
-                </div>
-                
-                <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                  <div className="text-sm font-semibold text-gray-900">Екатерина Егорова</div>
-                  <div className="text-xs text-gray-600">6+ лет опыта</div>
-                </div>
+              {/* Main photo - no container, just the image */}
+              <img 
+                src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
+                alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
+                className="w-96 h-[580px] lg:w-[450px] lg:h-[680px] object-cover transition-all duration-500 group-hover:scale-105"
+              />
+              
+              {/* Floating elements */}
+              <div className="absolute top-4 right-4 bg-green-500 text-white text-sm px-3 py-1 rounded-full shadow-lg animate-pulse">
+                Online
+              </div>
+              
+              <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                <div className="text-sm font-semibold text-gray-900">Екатерина Егорова</div>
+                <div className="text-xs text-gray-600">6+ лет опыта</div>
               </div>
 
               {/* Decorative elements */}
