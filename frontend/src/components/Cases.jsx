@@ -127,34 +127,34 @@ const Cases = ({ data }) => {
                 </div>
 
                 {/* Process */}
-                <div className="mb-8">
-                  <h4 className="text-xl font-bold text-gray-900 mb-4">Что делали</h4>
-                  <p className="text-gray-600 mb-6 text-lg leading-relaxed">{selectedCase.tasks}</p>
+                <div className="mb-6">
+                  <h4 className="text-lg font-bold text-gray-900 mb-3">Что делали</h4>
+                  <p className="text-gray-600 mb-4 leading-relaxed">{selectedCase.tasks}</p>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {selectedCase.process.map((step, index) => (
                       <div 
                         key={index} 
-                        className="flex items-center p-4 bg-gradient-to-r from-cyan-50 to-sky-50 rounded-lg hover:shadow-md transition-all duration-300 hover:scale-105 group"
+                        className="flex items-center p-3 bg-gradient-to-r from-cyan-50 to-sky-50 rounded-lg hover:shadow-md transition-all duration-300 hover:scale-105 group"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
-                        <div className="w-8 h-8 bg-gradient-to-br from-cyan-600 to-sky-600 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <div className="w-6 h-6 bg-gradient-to-br from-cyan-600 to-sky-600 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3 shadow-lg group-hover:scale-110 transition-transform">
                           {index + 1}
                         </div>
-                        <span className="text-gray-800 group-hover:text-cyan-700 transition-colors font-medium">{step}</span>
+                        <span className="text-gray-800 group-hover:text-cyan-700 transition-colors font-medium text-sm">{step}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* CTA */}
-                <div className="bg-gradient-to-r from-cyan-50 to-sky-50 rounded-2xl p-8 text-center relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                  <div className="absolute top-0 right-0 w-20 h-20 bg-cyan-200/30 rounded-full -translate-y-10 translate-x-10 group-hover:scale-150 transition-transform duration-500"></div>
+                <div className="bg-gradient-to-r from-cyan-50 to-sky-50 rounded-xl p-6 text-center relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-cyan-200/30 rounded-full -translate-y-8 translate-x-8 group-hover:scale-150 transition-transform duration-500"></div>
                   <div className="relative z-10">
-                    <h5 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-cyan-700 transition-colors">
+                    <h5 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-cyan-700 transition-colors">
                       Хотите такие же результаты?
                     </h5>
-                    <p className="text-gray-600 mb-4 text-lg">
+                    <p className="text-gray-600 mb-4">
                       Обсудим ваш проект и составим план продвижения
                     </p>
                     <Button className="bg-gradient-to-r from-cyan-600 to-sky-600 hover:from-cyan-700 hover:to-sky-700 text-white px-8 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 group/btn relative overflow-hidden">
