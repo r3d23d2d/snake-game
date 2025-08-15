@@ -106,9 +106,12 @@ const Services = ({ data }) => {
                 { day: "День 1", title: "Консультация и анализ", desc: "Изучаем вашу клинику, конкурентов и текущую ситуацию", color: "from-cyan-500 to-cyan-600" },
                 { day: "День 2-3", title: "Стратегия и настройка", desc: "Создаем стратегию продвижения и настраиваем кампании", color: "from-sky-500 to-sky-600" },
                 { day: "День 4-5", title: "Запуск и первые результаты", desc: "Запускаем рекламу и получаем первые заявки", color: "from-cyan-600 to-sky-600" }
-              ].map((step, index) => (
-                <div key={index} className={`flex items-center ${index % 2 === 0 ? 'justify-start' : 'justify-end'} animate-fade-in-up`} style={{ animationDelay: `${index * 300}ms` }}>
-                  <div className={`w-5/12 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
+              ].map((step, index) => {
+                // День 2-3 (index 1) должен быть справа, остальные по стандартной логике
+                const isRight = index === 1 || (index !== 1 && index % 2 !== 0);
+                return (
+                <div key={index} className={`flex items-center ${isRight ? 'justify-end' : 'justify-start'} animate-fade-in-up`} style={{ animationDelay: `${index * 300}ms` }}>
+                  <div className={`w-5/12 ${isRight ? 'pl-8 text-left' : 'pr-8 text-right'}`}>
                     <Card className="p-6 shadow-xl border-0 bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 group">
                       <div className="space-y-2">
                         <div className={`text-cyan-600 font-bold text-lg bg-gradient-to-r ${step.color} bg-clip-text text-transparent group-hover:scale-110 transition-transform`}>{step.day}</div>
