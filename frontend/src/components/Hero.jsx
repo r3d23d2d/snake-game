@@ -95,7 +95,7 @@ const Hero = ({ data, onOpenForm }) => {
             <div className="relative group">
               {/* Main photo - no container, just the image */}
               <img 
-                src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
+                src="https://customer-assets.emergentagent.com/job_stoma-marketing/artifacts/eqf5xwe3_555_1-Photoroom.png"
                 alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
                 className="w-[450px] h-[650px] lg:w-[550px] lg:h-[800px] object-contain transition-all duration-500 group-hover:scale-105"
               />
