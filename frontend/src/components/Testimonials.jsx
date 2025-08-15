@@ -128,31 +128,7 @@ const Testimonials = ({ data }) => {
           </Card>
         </div>
 
-        {/* Video testimonial placeholder */}
-        <div className="mt-16 text-center animate-fade-in-up delay-500">
-          <Card className="max-w-2xl mx-auto shadow-2xl border-0 hover:shadow-3xl transition-all duration-500 hover:-translate-y-1 bg-white/90 backdrop-blur-sm group">
-            <CardContent className="p-8">
-              <div className="aspect-video bg-gradient-to-br from-cyan-100 via-sky-50 to-cyan-100 rounded-lg flex items-center justify-center mb-6 relative overflow-hidden group-hover:from-cyan-200 group-hover:to-sky-100 transition-all duration-500">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 to-sky-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="text-center relative z-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-600 to-sky-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 cursor-pointer">
-                    <Play className="w-6 h-6 text-white ml-1 group-hover:scale-110 transition-transform" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-cyan-700 transition-colors">
-                    Видеоотзыв от доктора Манова
-                  </h3>
-                  <p className="text-gray-600 group-hover:text-cyan-600 transition-colors">
-                    Рассказывает о результатах работы и росте клиники на 230%
-                  </p>
-                </div>
-              </div>
-              <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 hover:shadow-md transition-all duration-300 hover:scale-105">
-                <Star className="w-4 h-4 mr-1 animate-spin-slow" />
-                Новое видео
-              </Badge>
-            </CardContent>
-          </Card>
-        </div>
+
       </div>
     </section>
   );
