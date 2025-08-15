@@ -47,18 +47,23 @@ const Cases = ({ data }) => {
                   onClick={() => setSelectedCase(caseItem)}
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <CardContent className="p-6">
-                    <h3 className={`font-bold mb-2 transition-colors duration-300 ${
+                  <CardContent className="p-4">
+                    <h3 className={`font-bold mb-1 text-sm transition-colors duration-300 ${
                       selectedCase.id === caseItem.id ? 'text-cyan-700' : 'text-gray-900 group-hover:text-cyan-600'
                     }`}>
                       {caseItem.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-4">
+                    <p className="text-gray-600 text-xs mb-3">
                       {caseItem.subtitle}
                     </p>
-                    <div className="flex items-center text-green-600 font-semibold text-sm group-hover:scale-105 transition-transform">
-                      <TrendingUp className="h-4 w-4 mr-1 animate-bounce" />
-                      {caseItem.results.growth}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-green-600 font-semibold text-xs group-hover:scale-105 transition-transform">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        {caseItem.results.growth}
+                      </div>
+                      <div className="text-cyan-600 text-xs font-medium">
+                        {caseItem.results.leads} заявок
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
