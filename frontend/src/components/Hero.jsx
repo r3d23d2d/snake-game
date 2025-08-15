@@ -21,11 +21,11 @@ const Hero = ({ data, onOpenForm }) => {
         <div className="absolute top-1/2 right-1/4 w-1.5 h-1.5 bg-sky-400 rounded-full animate-bounce delay-1500"></div>
       </div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-8">
-        <div className="grid lg:grid-cols-2 gap-12 items-end">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-20 pb-4">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-end">
           {/* Left content */}
-          <div className="space-y-8 animate-fade-in-up pb-8 lg:pb-16">
-            <div className="space-y-6">
+          <div className="space-y-6 lg:space-y-8 animate-fade-in-up pb-4 lg:pb-8 flex flex-col justify-center">
+            <div className="space-y-4 lg:space-y-6">
               <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-cyan-100 to-sky-100 text-cyan-800 rounded-full text-sm font-medium shadow-sm hover:shadow-md transition-all duration-300 group">
                 <Sparkles className="w-4 h-4 mr-2 animate-spin-slow" />
                 <span className="group-hover:scale-105 transition-transform">Специализация: стоматология</span>
