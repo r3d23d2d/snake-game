@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { Star, Quote, Play, MessageCircle } from 'lucide-react';
+import { Star, Quote, MessageCircle } from 'lucide-react';
 
 const Testimonials = ({ data }) => {
   const sectionRef = useRef(null);
