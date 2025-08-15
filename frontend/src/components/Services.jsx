@@ -107,7 +107,7 @@ const Services = ({ data }) => {
                 { day: "День 2-3", title: "Стратегия и настройка", desc: "Создаем стратегию продвижения и настраиваем кампании", color: "from-sky-500 to-sky-600" },
                 { day: "День 4-5", title: "Запуск и первые результаты", desc: "Запускаем рекламу и получаем первые заявки", color: "from-cyan-600 to-sky-600" }
               ].map((step, index) => {
-                // День 2-3 (index 1) должен быть справа, остальные по стандартной логике
+                // День 2-3 (index 1) должен быть справа, остальные по стандартной логике  
                 const isRight = index === 1 || (index !== 1 && index % 2 !== 0);
                 return (
                 <div key={index} className={`flex items-center ${isRight ? 'justify-end' : 'justify-start'} animate-fade-in-up`} style={{ animationDelay: `${index * 300}ms` }}>
@@ -127,7 +127,8 @@ const Services = ({ data }) => {
                   
                   <div className="w-5/12"></div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
