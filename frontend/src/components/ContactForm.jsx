@@ -50,7 +50,7 @@ const ContactForm = ({ isOpen, onClose, contact }) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl" aria-describedby="dialog-description">
+      <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
         <DialogHeader className="text-center">
           <div className="mx-auto w-16 h-16 bg-gradient-to-br from-cyan-100 to-sky-200 rounded-full flex items-center justify-center mb-4 animate-bounce">
             <Sparkles className="w-8 h-8 text-cyan-600" />
@@ -58,9 +58,9 @@ const ContactForm = ({ isOpen, onClose, contact }) => {
           <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-cyan-700 to-sky-700 bg-clip-text text-transparent">
             Получить консультацию
           </DialogTitle>
-          <p id="dialog-description" className="text-gray-600 mt-2">
+          <DialogDescription className="text-gray-600 mt-2">
             Обсудим ваш проект и составим план продвижения
-          </p>
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in-up">
