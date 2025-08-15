@@ -97,7 +97,7 @@ const Hero = ({ data, onOpenForm }) => {
               <img 
                 src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
                 alt="Екатерина Егорова - Специалист по контекстной рекламе для стоматологий"
-                className="w-96 h-[580px] lg:w-[450px] lg:h-[680px] object-cover transition-all duration-500 group-hover:scale-105"
+                className="w-96 h-[580px] lg:w-[450px] lg:h-[680px] object-contain transition-all duration-500 group-hover:scale-105"
               />
               
               {/* Floating elements */}
