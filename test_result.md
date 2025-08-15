@@ -150,6 +150,7 @@
 
 ## test_plan:
   current_focus:
+    - "FastAPI Server Health and Endpoints"
     - "Hero Section Layout Adjustments"
   stuck_tasks: []
   test_all: false
