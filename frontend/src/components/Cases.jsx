@@ -84,44 +84,44 @@ const Cases = ({ data }) => {
                 </div>
               </div>
               
-              <CardContent className="p-8">
+              <CardContent className="p-6">
                 {/* Results */}
-                <div className="mb-8">
-                  <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                    <TrendingUp className="w-6 h-6 mr-2 text-cyan-600" />
+                <div className="mb-6">
+                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-2 text-cyan-600" />
                     Результаты работы
                   </h4>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
-                      <Users className="h-8 w-8 text-green-600 mx-auto mb-3 group-hover:animate-bounce" />
-                      <div className="text-3xl font-bold text-green-600 mb-1 group-hover:scale-110 transition-transform">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                      <Users className="h-6 w-6 text-green-600 mx-auto mb-2 group-hover:animate-bounce" />
+                      <div className="text-2xl font-bold text-green-600 mb-1 group-hover:scale-110 transition-transform">
                         {selectedCase.results.leads}
                       </div>
-                      <div className="text-gray-600">заявок в месяц</div>
+                      <div className="text-gray-600 text-sm">заявок в месяц</div>
                     </div>
                     
-                    <div className="bg-gradient-to-br from-cyan-50 to-sky-50 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
-                      <DollarSign className="h-8 w-8 text-cyan-600 mx-auto mb-3 group-hover:animate-bounce" />
-                      <div className="text-3xl font-bold text-cyan-600 mb-1 group-hover:scale-110 transition-transform">
+                    <div className="bg-gradient-to-br from-cyan-50 to-sky-50 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                      <DollarSign className="h-6 w-6 text-cyan-600 mx-auto mb-2 group-hover:animate-bounce" />
+                      <div className="text-2xl font-bold text-cyan-600 mb-1 group-hover:scale-110 transition-transform">
                         {selectedCase.results.cost_per_lead}₽
                       </div>
-                      <div className="text-gray-600">стоимость заявки</div>
+                      <div className="text-gray-600 text-sm">стоимость заявки</div>
                     </div>
                     
-                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
-                      <Calendar className="h-8 w-8 text-purple-600 mx-auto mb-3 group-hover:animate-bounce" />
-                      <div className="text-3xl font-bold text-purple-600 mb-1 group-hover:scale-110 transition-transform">
+                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                      <Calendar className="h-6 w-6 text-purple-600 mx-auto mb-2 group-hover:animate-bounce" />
+                      <div className="text-2xl font-bold text-purple-600 mb-1 group-hover:scale-110 transition-transform">
                         {selectedCase.results.budget.toLocaleString()}₽
                       </div>
-                      <div className="text-gray-600">бюджет в месяц</div>
+                      <div className="text-gray-600 text-sm">бюджет в месяц</div>
                     </div>
                     
-                    <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-6 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
-                      <TrendingUp className="h-8 w-8 text-orange-600 mx-auto mb-3 group-hover:animate-bounce" />
-                      <div className="text-3xl font-bold text-orange-600 mb-1 group-hover:scale-110 transition-transform">
+                    <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 text-center hover:shadow-lg transition-all duration-300 hover:scale-105 group">
+                      <TrendingUp className="h-6 w-6 text-orange-600 mx-auto mb-2 group-hover:animate-bounce" />
+                      <div className="text-2xl font-bold text-orange-600 mb-1 group-hover:scale-110 transition-transform">
                         {selectedCase.results.growth}
                       </div>
-                      <div className="text-gray-600 font-medium">рост пациентов</div>
+                      <div className="text-gray-600 font-medium text-sm">рост пациентов</div>
                     </div>
                   </div>
                 </div>
