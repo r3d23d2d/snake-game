@@ -98,14 +98,19 @@ const Hero = ({ data, onOpenForm }) => {
               
               <div className="space-y-6 relative z-10">
                 <div className="text-center">
-                  {/* Professional photo */}
-                  <div className="w-24 h-24 mx-auto mb-4 relative group/avatar">
+                  {/* Professional full-body photo */}
+                  <div className="w-40 h-48 mx-auto mb-4 relative group/avatar overflow-hidden rounded-2xl shadow-lg group-hover/avatar:shadow-2xl transition-all duration-500">
                     <img 
                       src="https://static.tildacdn.com/tild3433-6665-4038-a139-336463353464/555_1.png"
                       alt="Екатерина Егорова - Специалист по контекстной рекламе"
-                      className="w-full h-full object-cover rounded-full shadow-lg group-hover/avatar:shadow-xl transition-all duration-300 group-hover/avatar:scale-110 border-4 border-white group-hover/avatar:border-cyan-200"
+                      className="w-full h-full object-cover transition-all duration-500 group-hover/avatar:scale-110"
                     />
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-cyan-600/10 to-sky-600/10 opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-cyan-600/20 via-transparent to-transparent opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-500"></div>
+                    
+                    {/* Floating badge */}
+                    <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg animate-pulse">
+                      Online
+                    </div>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-cyan-700 transition-colors">
                     Екатерина Егорова
