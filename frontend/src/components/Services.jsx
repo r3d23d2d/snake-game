@@ -141,20 +141,6 @@ const Services = ({ data }) => {
                       </Card>
                     )}
                   </div>
-                    <Card className="p-6 shadow-xl border-0 bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 group">
-                      <div className="space-y-2">
-                        <div className={`text-cyan-600 font-bold text-lg bg-gradient-to-r ${step.color} bg-clip-text text-transparent group-hover:scale-110 transition-transform`}>{step.day}</div>
-                        <h4 className="font-bold text-gray-900 text-lg group-hover:text-cyan-700 transition-colors">{step.title}</h4>
-                        <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
-                      </div>
-                    </Card>
-                  </div>
-                  
-                  <div className={`w-10 h-10 bg-gradient-to-br ${step.color} rounded-full border-4 border-white shadow-xl z-10 flex items-center justify-center hover:scale-125 transition-transform duration-300 cursor-pointer`}>
-                    <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                  </div>
-                  
-                  <div className="w-5/12"></div>
                 </div>
                 );
               })}
