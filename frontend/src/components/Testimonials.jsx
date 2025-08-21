@@ -95,39 +95,6 @@ const Testimonials = ({ data }) => {
           ))}
         </div>
 
-        {/* Social proof numbers */}
-        <div className="mt-20 animate-fade-in-up delay-300">
-          <Card className="bg-gradient-to-r from-cyan-50 via-sky-50 to-cyan-50 border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 relative overflow-hidden group">
-            {/* Background animation */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-200/20 rounded-full -translate-y-16 translate-x-16 group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-sky-300/30 rounded-full translate-y-12 -translate-x-12 group-hover:scale-150 transition-transform duration-700 delay-200"></div>
-            
-            <CardContent className="p-8 relative z-10">
-              <div className="grid md:grid-cols-4 gap-8 text-center">
-                {[
-                  { number: "98%", text: "довольных клиентов", color: "from-cyan-600 to-sky-600", delay: "0ms" },
-                  { number: "4.9", text: "средний рейтинг", color: "from-green-600 to-emerald-600", delay: "200ms" },
-                  { number: "2.5 года", text: "средняя длительность сотрудничества", color: "from-purple-600 to-violet-600", delay: "400ms" },
-                  { number: "95%", text: "продлевают договор", color: "from-orange-600 to-amber-600", delay: "600ms" }
-                ].map((stat, index) => (
-                  <div 
-                    key={index}
-                    className="group/stat animate-fade-in-up"
-                    style={{ animationDelay: stat.delay }}
-                  >
-                    <div className={`text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2 group-hover/stat:scale-110 transition-transform duration-300`}>
-                      {stat.number}
-                    </div>
-                    <div className="text-gray-600 group-hover/stat:text-cyan-600 transition-colors duration-300">
-                      {stat.text}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
 
       </div>
     </section>
