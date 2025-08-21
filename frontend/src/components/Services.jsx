@@ -107,11 +107,40 @@ const Services = ({ data }) => {
                 { day: "День 2-3", title: "Стратегия и настройка", desc: "Создаем стратегию продвижения и настраиваем кампании", color: "from-sky-500 to-sky-600" },
                 { day: "День 4-5", title: "Запуск и первые результаты", desc: "Запускаем рекламу и получаем первые заявки", color: "from-cyan-600 to-sky-600" }
               ].map((step, index) => {
-                // День 2-3 (index 1) должен быть справа, остальные по стандартной логике  
-                const isRight = index === 1 || (index !== 1 && index % 2 !== 0);
+                // День 2-3 (index 1) должен быть справа от линии
+                const isRight = index === 1; // Только День 2-3 справа
                 return (
-                <div key={index} className={`flex items-center ${isRight ? 'justify-end' : 'justify-start'} animate-fade-in-up`} style={{ animationDelay: `${index * 300}ms` }}>
-                  <div className={`w-5/12 ${isRight ? 'pl-8 text-left' : 'pr-8 text-right'}`}>
+                <div key={index} className={`flex items-center animate-fade-in-up`} style={{ animationDelay: `${index * 300}ms` }}>
+                  {/* Левая часть - контент или пустое место */}
+                  <div className={`w-5/12 ${isRight ? '' : 'pr-8 text-right'}`}>
+                    {!isRight && (
+                      <Card className="p-6 shadow-xl border-0 bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 group">
+                        <div className="space-y-2">
+                          <div className={`text-cyan-600 font-bold text-lg bg-gradient-to-r ${step.color} bg-clip-text text-transparent group-hover:scale-110 transition-transform`}>{step.day}</div>
+                          <h4 className="font-bold text-gray-900 text-lg group-hover:text-cyan-700 transition-colors">{step.title}</h4>
+                          <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                  
+                  {/* Центральная линия с точкой */}
+                  <div className={`w-10 h-10 bg-gradient-to-br ${step.color} rounded-full border-4 border-white shadow-xl z-10 flex items-center justify-center hover:scale-125 transition-transform duration-300 cursor-pointer`}>
+                    <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                  </div>
+                  
+                  {/* Правая часть - контент или пустое место */}
+                  <div className={`w-5/12 ${isRight ? 'pl-8 text-left' : ''}`}>
+                    {isRight && (
+                      <Card className="p-6 shadow-xl border-0 bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 group">
+                        <div className="space-y-2">
+                          <div className={`text-cyan-600 font-bold text-lg bg-gradient-to-r ${step.color} bg-clip-text text-transparent group-hover:scale-110 transition-transform`}>{step.day}</div>
+                          <h4 className="font-bold text-gray-900 text-lg group-hover:text-cyan-700 transition-colors">{step.title}</h4>
+                          <p className="text-gray-600 text-sm leading-relaxed">{step.desc}</p>
+                        </div>
+                      </Card>
+                    )}
+                  </div>
                     <Card className="p-6 shadow-xl border-0 bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 group">
                       <div className="space-y-2">
                         <div className={`text-cyan-600 font-bold text-lg bg-gradient-to-r ${step.color} bg-clip-text text-transparent group-hover:scale-110 transition-transform`}>{step.day}</div>
