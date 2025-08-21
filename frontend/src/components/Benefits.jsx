@@ -90,9 +90,9 @@ const Benefits = ({ data }) => {
           </h3>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { number: "50+", text: "стоматологий работают со мной", color: "from-cyan-600 to-sky-600", delay: "0ms" },
+              { number: "30+", text: "запустила стоматологий", color: "from-cyan-600 to-sky-600", delay: "0ms" },
               { number: "6+", text: "лет специализации в нише", color: "from-green-600 to-emerald-600", delay: "200ms" },
-              { number: "95%", text: "клиентов продлевают сотрудничество", color: "from-purple-600 to-violet-600", delay: "400ms" }
+              { number: "85%", text: "клиентов работают долгосрочно", color: "from-purple-600 to-violet-600", delay: "400ms" }
             ].map((stat, index) => (
               <div 
                 key={index}
