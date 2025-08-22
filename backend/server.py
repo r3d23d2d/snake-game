@@ -353,6 +353,16 @@ class ContractCreate(BaseModel):
     contract_end_date: str
     contract_end_month: str
 
+def add_formatted_paragraph(doc, text, bold=False, alignment=WD_ALIGN_PARAGRAPH.LEFT):
+    """Add a paragraph with consistent Times New Roman 11pt formatting"""
+    para = doc.add_paragraph()
+    run = para.add_run(text)
+    run.font.name = 'Times New Roman'
+    run.font.size = Pt(11)
+    run.bold = bold
+    para.alignment = alignment
+    return para
+
 def create_word_contract(contract_data):
     """Create a Word document with the contract content"""
     doc = Document()
@@ -371,35 +381,26 @@ def create_word_contract(contract_data):
     style.font.size = Pt(11)
     
     # Title
-    title = doc.add_paragraph()
-    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title_run = title.add_run(f"Договор об оказании услуг № {contract_data['contract_number']}")
-    title_run.bold = True
-    title_run.font.name = 'Times New Roman'
-    title_run.font.size = Pt(11)
+    add_formatted_paragraph(doc, 
+        f"Договор об оказании услуг № {contract_data['contract_number']}", 
+        bold=True, 
+        alignment=WD_ALIGN_PARAGRAPH.CENTER)
     
     # Location and date
-    loc_date = doc.add_paragraph()
-    loc_date.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    date_run = loc_date.add_run('г. Казань «___» 2025 г.')
-    date_run.font.name = 'Times New Roman'
-    date_run.font.size = Pt(11)
+    add_formatted_paragraph(doc, 
+        'г. Казань «___» 2025 г.', 
+        alignment=WD_ALIGN_PARAGRAPH.CENTER)
     
     # Contract parties
-    parties = doc.add_paragraph()
-    parties.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    parties_text = f'Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {contract_data["client_name"]}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:'
-    parties_run = parties.add_run(parties_text)
-    parties_run.font.name = 'Times New Roman'
-    parties_run.font.size = Pt(11)
+    add_formatted_paragraph(doc, 
+        f'Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {contract_data["client_name"]}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:', 
+        alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
     
     # Section 1 - Subject
-    section1_title = doc.add_paragraph()
-    section1_run = section1_title.add_run("1. ПРЕДМЕТ ДОГОВОРА")
-    section1_run.bold = True
-    section1_run.font.name = 'Times New Roman'
-    section1_run.font.size = Pt(11)
-    section1_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    add_formatted_paragraph(doc, 
+        "1. ПРЕДМЕТ ДОГОВОРА", 
+        bold=True, 
+        alignment=WD_ALIGN_PARAGRAPH.CENTER)
     
     doc.add_paragraph('1.1. «Исполнитель» принимает на себя обязательства оказать комплекс услуг в соответствии с заявками «Заказчика», а «Заказчик» обязуется принять услуги и оплатить их в размере и порядке, установленном настоящим договором.')
     
