@@ -986,6 +986,7 @@ async def download_contract_word(contract_id: str):
     
     # Prepare contract data for Word generation
     contract_data = {
+        "contract_number": "[Номер договора]",  # Legacy contracts don't have auto-generated numbers
         "client_name": contract_obj.client_name,
         "service_cost": contract_obj.service_cost,
         "service_cost_words": contract_obj.service_cost_words,
