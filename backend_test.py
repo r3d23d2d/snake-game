@@ -398,13 +398,13 @@ class ContractSystemTester:
         return success
 
     def test_create_minimal_client(self):
-        """Test creating a client with minimal data (only name)"""
+        """Test creating a client with minimal data (only name_or_organization)"""
         client_data = {
-            "name": "Тестовый Клиент Минимальный"
+            "name_or_organization": "Тестовый Клиент Минимальный"
         }
         
         success, response = self.run_test(
-            "Create Minimal Client",
+            "Create Minimal Client (Simplified Structure)",
             "POST",
             "clients",
             200,
