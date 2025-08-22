@@ -113,8 +113,8 @@ user_problem_statement: |
 
 backend:
   - task: "Add number-to-words conversion function"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "server.py"  
     stuck_count: 0
     priority: "high"
@@ -123,10 +123,13 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "Need to create function to convert numbers to Russian words for rubles"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: number_to_words_ru function working correctly. Tested with amounts: 0, 1, 2, 5, 11, 23, 100, 1000, 1234, 30000, 1000000. All conversions produce correct Russian word forms with proper ruble cases. Fixed issue where thousands and millions were missing 'рублей' suffix."
 
   - task: "Update contract model for auto-generated contract number"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "server.py"
     stuck_count: 0  
     priority: "high"
@@ -135,10 +138,13 @@ backend:
         - working: "NA"
           agent: "main"
           comment: "Add automatic contract number generation based on creation date"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: generate_contract_number() function working correctly. Generates format КР + DD.MM.YY based on current date. Contract numbers are automatically assigned to new direct contracts."
 
   - task: "Remove client storage requirement and add direct contract creation"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
@@ -147,6 +153,57 @@ backend:
         - working: "NA"
           agent: "main"  
           comment: "Remove client CRUD, create contracts directly with client data"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Direct contract creation API (/api/contracts/direct) working perfectly. Contracts can be created without separate client records. All CRUD operations (POST, GET, PUT, DELETE) tested successfully. Word download functionality working with proper filename encoding."
+
+  - task: "Add contract end date calculation function"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: calculate_contract_end_date() function working correctly. Tested with 1, 6, and 12 month durations. Properly calculates end dates and returns correct Russian month names (января, февраля, марта, etc.)."
+
+  - task: "Direct contract API endpoints"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: All direct contract API endpoints working: POST /api/contracts/direct (create), GET /api/contracts/direct (list), GET /api/contracts/direct/{id} (get specific), PUT /api/contracts/direct/{id} (update), DELETE /api/contracts/direct/{id} (delete), GET /api/contracts/direct/{id}/download (Word download). All endpoints tested with real data and working correctly."
+
+  - task: "Word document generation with contract number in title"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Word document generation working correctly. Documents include contract number in title and filename. Fixed Unicode encoding issues with Cyrillic characters in filenames. Documents are properly formatted with all contract data."
+
+  - task: "Legacy contract creation endpoint fix"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Fixed missing POST /api/contracts endpoint for legacy contract creation. Added proper decorator and fixed template formatting issues. Legacy contracts now work alongside new direct contracts."
 
 frontend:
   - task: "Create single page layout instead of tabs"
