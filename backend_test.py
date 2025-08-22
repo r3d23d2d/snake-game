@@ -684,6 +684,467 @@ class DirectContractTester:
             print(f"❌ Failed - Error: {str(e)}")
             return False
 
+    def test_contract_content_editing(self):
+        """Test new contract content editing endpoints - PUT /api/contracts/direct/{id}/content"""
+        # Create a contract for content editing testing
+        contract_data = {
+            "name_or_organization": "ООО Тест Редактирование",
+            "other_details": "Данные для тестирования редактирования содержимого",
+            "service_cost": 40000,
+            "duration_months": 6
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Content Editing Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            return False
+            
+        contract_id = response['id']
+        original_content = response.get('contract_content', '')
+        self.created_contract_ids.append(contract_id)
+        
+        print(f"   Original content length: {len(original_content)} characters")
+        
+        # Test updating contract content
+        custom_content = """**Договор об оказании услуг № {contract_number}**
+
+ИЗМЕНЕННОЕ СОДЕРЖИМОЕ ДОГОВОРА
+
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и ООО Тест Редактирование, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. Данный договор был изменен через новый API endpoint для редактирования содержимого.
+
+1.2. Исполнитель обязуется оказать услуги по созданию и ведению рекламных кампаний.
+
+**2. СТОИМОСТЬ УСЛУГ**
+
+2.1. Стоимость услуг составляет 40000 (сорок тысяч) рублей.
+
+**3. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ**
+
+3.1. Настоящий договор составлен в двух экземплярах.
+
+**ПОДПИСИ СТОРОН**
+
+Исполнитель: ________________/Шамсутдинов Р.Р.
+
+Заказчик: ________________/ООО Тест Редактирование"""
+
+        content_update_data = {
+            "contract_content": custom_content
+        }
+        
+        success, response = self.run_test(
+            "Update Contract Content",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=content_update_data,
+            return_response=True
+        )
+        
+        if not success:
+            return False
+        
+        # Verify content was updated
+        updated_content = response.get('contract_content', '')
+        if updated_content == custom_content:
+            print("   ✅ Contract content updated successfully")
+        else:
+            print("   ❌ Contract content not updated correctly")
+            return False
+        
+        # Verify other fields remain unchanged
+        checks = [
+            ('Contract ID preserved', response.get('id') == contract_id),
+            ('Client name preserved', response.get('client_name') == 'ООО Тест Редактирование'),
+            ('Service cost preserved', response.get('service_cost') == 40000),
+            ('Contract number preserved', response.get('contract_number') is not None)
+        ]
+        
+        all_preserved = True
+        for check_name, check_result in checks:
+            if check_result:
+                print(f"   ✅ {check_name}")
+            else:
+                print(f"   ❌ {check_name}")
+                all_preserved = False
+        
+        # Verify content contains our custom text
+        content_checks = [
+            ('Custom header found', 'ИЗМЕНЕННОЕ СОДЕРЖИМОЕ ДОГОВОРА' in updated_content),
+            ('Custom clause found', 'изменен через новый API endpoint' in updated_content),
+            ('Original client name preserved', 'ООО Тест Редактирование' in updated_content),
+            ('Original cost preserved', '40000' in updated_content and 'сорок тысяч' in updated_content)
+        ]
+        
+        for check_name, check_result in content_checks:
+            if check_result:
+                print(f"   ✅ {check_name}")
+            else:
+                print(f"   ❌ {check_name}")
+                all_preserved = False
+        
+        # Test retrieving the contract to verify content persisted in database
+        success, db_response = self.run_test(
+            "Verify Content Persisted in Database",
+            "GET",
+            f"contracts/direct/{contract_id}",
+            200,
+            return_response=True
+        )
+        
+        if success:
+            db_content = db_response.get('contract_content', '')
+            if db_content == custom_content:
+                print("   ✅ Updated content persisted in database")
+            else:
+                print("   ❌ Updated content NOT persisted in database")
+                all_preserved = False
+        else:
+            print("   ❌ Failed to retrieve contract from database")
+            all_preserved = False
+        
+        return all_preserved
+
+    def test_custom_contract_download(self):
+        """Test custom contract download with GET /api/contracts/direct/{id}/download_custom"""
+        # Create a contract for custom download testing
+        contract_data = {
+            "name_or_organization": "ООО Тест Кастомное Скачивание",
+            "other_details": "Данные для тестирования кастомного скачивания",
+            "service_cost": 60000,
+            "duration_months": 12
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Custom Download Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            return False
+            
+        contract_id = response['id']
+        contract_number = response.get('contract_number', '')
+        self.created_contract_ids.append(contract_id)
+        
+        # Update contract content with custom text
+        custom_content = """**Договор об оказании услуг № {contract_number}**
+
+КАСТОМНОЕ СОДЕРЖИМОЕ ДЛЯ СКАЧИВАНИЯ
+
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и ООО Тест Кастомное Скачивание, именуемый в дальнейшем «Заказчик», с другой стороны.
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. Этот договор содержит кастомное содержимое для тестирования функции скачивания измененного документа.
+
+1.2. Исполнитель обязуется оказать услуги по созданию рекламных кампаний стоимостью 60000 рублей.
+
+**2. ОСОБЫЕ УСЛОВИЯ**
+
+2.1. Данный раздел добавлен для проверки кастомного содержимого.
+
+2.2. Договор действует в течение 12 месяцев.
+
+**3. ПОДПИСИ СТОРОН**
+
+Исполнитель: ________________/Шамсутдинов Р.Р.
+
+Заказчик: ________________/ООО Тест Кастомное Скачивание
+
+КОНЕЦ КАСТОМНОГО СОДЕРЖИМОГО"""
+
+        content_update_data = {
+            "contract_content": custom_content
+        }
+        
+        # Update content first
+        success, update_response = self.run_test(
+            "Update Content for Custom Download",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=content_update_data,
+            return_response=True
+        )
+        
+        if not success:
+            return False
+        
+        # Test custom download
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download_custom"
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Custom Contract Download...")
+        print(f"   URL: {url}")
+        
+        try:
+            download_response = requests.get(url)
+            
+            success = download_response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {download_response.status_code}")
+                
+                # Check Content-Type header
+                content_type = download_response.headers.get('Content-Type', '')
+                expected_content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                if expected_content_type in content_type:
+                    print("   ✅ Correct Content-Type for Word document")
+                else:
+                    print(f"   ❌ Wrong Content-Type: {content_type}")
+                    return False
+                
+                # Check Content-Disposition header for filename
+                content_disposition = download_response.headers.get('Content-Disposition', '')
+                if 'attachment' in content_disposition and 'filename=' in content_disposition:
+                    print("   ✅ Correct Content-Disposition header with filename")
+                    # Extract filename
+                    filename_part = content_disposition.split('filename=')[1]
+                    print(f"   📄 Filename: {filename_part}")
+                    
+                    # Check if filename contains 'custom' and contract info
+                    if 'custom' in filename_part.lower() and '.docx' in filename_part:
+                        print("   ✅ Filename indicates custom document and has .docx extension")
+                    else:
+                        print("   ❌ Filename format incorrect for custom document")
+                        return False
+                else:
+                    print(f"   ❌ Wrong Content-Disposition: {content_disposition}")
+                    return False
+                
+                # Check file size (Word documents should have reasonable size)
+                content_length = len(download_response.content)
+                if content_length > 1000:  # At least 1KB for a Word document
+                    print(f"   ✅ File size reasonable: {content_length} bytes")
+                else:
+                    print(f"   ❌ File size too small: {content_length} bytes")
+                    return False
+                
+                # Check if it's actually a Word document by checking magic bytes
+                if download_response.content.startswith(b'PK'):  # ZIP-based format (Word .docx)
+                    print("   ✅ File appears to be a valid Word document (ZIP-based)")
+                else:
+                    print("   ❌ File does not appear to be a valid Word document")
+                    return False
+                
+                # Verify document contains custom content
+                import tempfile
+                import zipfile
+                
+                with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                    temp_file.write(download_response.content)
+                    temp_file_path = temp_file.name
+                
+                try:
+                    # Extract and check document content
+                    with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                        # Read the main document XML
+                        document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                        
+                        # Check for custom content markers
+                        custom_checks = [
+                            ('Custom header', 'КАСТОМНОЕ СОДЕРЖИМОЕ ДЛЯ СКАЧИВАНИЯ' in document_xml),
+                            ('Custom clause', 'кастомное содержимое для тестирования' in document_xml),
+                            ('Special section', 'ОСОБЫЕ УСЛОВИЯ' in document_xml),
+                            ('Custom ending', 'КОНЕЦ КАСТОМНОГО СОДЕРЖИМОГО' in document_xml),
+                            ('Client name', 'ООО Тест Кастомное Скачивание' in document_xml),
+                            ('Contract number', contract_number in document_xml)
+                        ]
+                        
+                        all_custom_content_found = True
+                        for check_name, check_result in custom_checks:
+                            if check_result:
+                                print(f"   ✅ {check_name} found in custom document")
+                            else:
+                                print(f"   ❌ {check_name} NOT found in custom document")
+                                all_custom_content_found = False
+                        
+                        # Check for header with Kazan and date
+                        if 'Казань' in document_xml:
+                            print("   ✅ 'Казань' found in custom document header")
+                        else:
+                            print("   ❌ 'Казань' NOT found in custom document header")
+                            all_custom_content_found = False
+                        
+                        return all_custom_content_found
+                        
+                except Exception as e:
+                    print(f"   ❌ Error checking custom document content: {str(e)}")
+                    return False
+                finally:
+                    # Clean up temporary file
+                    import os
+                    try:
+                        os.unlink(temp_file_path)
+                    except:
+                        pass
+                
+            else:
+                print(f"❌ Failed - Expected 200, got {download_response.status_code}")
+                print(f"   Response: {download_response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+
+    def test_contract_content_validation(self):
+        """Test ContractContentUpdate model validation"""
+        # Create a contract for validation testing
+        contract_data = {
+            "name_or_organization": "ООО Тест Валидация",
+            "other_details": "Данные для тестирования валидации",
+            "service_cost": 25000,
+            "duration_months": 6
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Validation Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            return False
+            
+        contract_id = response['id']
+        self.created_contract_ids.append(contract_id)
+        
+        # Test 1: Valid content update
+        valid_content = "Валидное содержимое договора для тестирования модели ContractContentUpdate"
+        valid_data = {"contract_content": valid_content}
+        
+        success, response = self.run_test(
+            "Valid Content Update",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=valid_data,
+            return_response=True
+        )
+        
+        if not success:
+            return False
+        
+        if response.get('contract_content') == valid_content:
+            print("   ✅ Valid content update successful")
+        else:
+            print("   ❌ Valid content update failed")
+            return False
+        
+        # Test 2: Empty content (should be rejected)
+        empty_data = {"contract_content": ""}
+        
+        success, response = self.run_test(
+            "Empty Content Update (Should Fail)",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            422,  # Validation error expected
+            data=empty_data,
+            return_response=True
+        )
+        
+        if success:  # Success means we got the expected 422 status
+            print("   ✅ Empty content properly rejected with validation error")
+        else:
+            print("   ❌ Empty content was not properly rejected")
+            return False
+        
+        # Test 3: Missing contract_content field
+        missing_field_data = {"wrong_field": "some content"}
+        
+        success, response = self.run_test(
+            "Missing Field Update (Should Fail)",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            422,  # Validation error expected
+            data=missing_field_data,
+            return_response=True
+        )
+        
+        if success:  # Success means we got the expected 422 status
+            print("   ✅ Missing field properly rejected with validation error")
+        else:
+            print("   ❌ Missing field was not properly rejected")
+            return False
+        
+        # Test 4: Very long content (should be accepted)
+        long_content = "Очень длинное содержимое договора. " * 100  # 3700+ characters
+        long_data = {"contract_content": long_content}
+        
+        success, response = self.run_test(
+            "Long Content Update",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=long_data,
+            return_response=True
+        )
+        
+        if success and response.get('contract_content') == long_content:
+            print(f"   ✅ Long content ({len(long_content)} chars) accepted successfully")
+        else:
+            print("   ❌ Long content update failed")
+            return False
+        
+        # Test 5: Content with special characters and formatting
+        special_content = """Договор с **жирным текстом**, _курсивом_ и специальными символами:
+        
+№ 123-456/789
+Стоимость: 25,000.00 ₽
+Email: test@example.com
+Телефон: +7 (123) 456-78-90
+Адрес: г. Москва, ул. Тестовая, д. 1, кв. 2
+
+"Кавычки", 'апострофы', и другие символы: @#$%^&*()[]{}|\\:";'<>?,./
+
+Многострочный
+текст
+с переносами"""
+        
+        special_data = {"contract_content": special_content}
+        
+        success, response = self.run_test(
+            "Special Characters Content Update",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=special_data,
+            return_response=True
+        )
+        
+        if success and response.get('contract_content') == special_content:
+            print("   ✅ Content with special characters accepted successfully")
+        else:
+            print("   ❌ Content with special characters update failed")
+            return False
+        
+        print("   ✅ All ContractContentUpdate model validation tests passed")
+        return True
+
     def cleanup_contracts(self):
         """Clean up all created contracts"""
         print(f"\n🧹 Cleaning up {len(self.created_contract_ids)} created contracts...")
