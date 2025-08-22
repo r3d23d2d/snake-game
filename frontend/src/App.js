@@ -120,6 +120,82 @@ function App() {
     }
   };
 
+  const handleEditContent = () => {
+    if (currentContract) {
+      setEditedContent(currentContract.contract_content);
+      setIsEditingContent(true);
+    }
+  };
+
+  const handleSaveContent = async () => {
+    if (!editedContent.trim()) {
+      toast({
+        title: "Ошибка",
+        description: "Содержимое договора не может быть пустым",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.put(`${API}/contracts/direct/${currentContract.id}/content`, {
+        contract_content: editedContent
+      });
+      
+      toast({
+        title: "Успешно",
+        description: "Содержимое договора обновлено",
+      });
+      
+      setCurrentContract(response.data);
+      setIsEditingContent(false);
+    } catch (error) {
+      console.error('Error updating contract content:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось обновить содержимое договора",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  };
+
+  const downloadCustomContract = async () => {
+    if (!currentContract) return;
+    
+    try {
+      const response = await axios.get(`${API}/contracts/direct/${currentContract.id}/download_custom`, {
+        responseType: 'blob'
+      });
+      
+      const blob = new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      });
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Договор_Редактированный_${currentContract.client_name.replace(/\s+/g, '_')}.docx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Успешно",
+        description: "Редактированный договор скачан в формате Word",
+      });
+    } catch (error) {
+      console.error('Error downloading custom contract:', error);
+      toast({
+        title: "Ошибка",
+        description: "Не удалось скачать редактированный договор",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveEdit = async () => {
     if (!editForm.name_or_organization.trim()) {
       toast({
