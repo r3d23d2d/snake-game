@@ -360,6 +360,55 @@ class ContractContentUpdate(BaseModel):
     """Model for updating only the contract content text"""
     contract_content: str
 
+def to_genitive_case(name_or_organization):
+    """Convert name or organization to genitive case (родительский падеж)"""
+    # Simple rules for converting to genitive case
+    name = name_or_organization.strip()
+    
+    # For organizations starting with ООО, ИП, ОАО etc.
+    if any(name.upper().startswith(prefix) for prefix in ['ООО', 'ИП', 'ОАО', 'ЗАО', 'АО']):
+        return name  # Organizations usually don't change
+    
+    # For individual names (very basic rules)
+    if ' ' in name:
+        # If it's a full name (has spaces), apply basic genitive rules
+        words = name.split()
+        converted_words = []
+        
+        for word in words:
+            if word.endswith('а'):
+                converted_words.append(word[:-1] + 'ы')
+            elif word.endswith('я'):
+                converted_words.append(word[:-1] + 'и')
+            elif word.endswith('ь'):
+                converted_words.append(word[:-1] + 'и')
+            elif word.endswith('й'):
+                converted_words.append(word[:-1] + 'я')
+            elif word.endswith(('ов', 'ев', 'ин')):
+                converted_words.append(word + 'а')
+            elif word.endswith('ич'):
+                converted_words.append(word + 'а')
+            else:
+                # For other endings, add 'а' if it's likely a surname
+                if len(word) > 3 and word[0].isupper():
+                    converted_words.append(word + 'а')
+                else:
+                    converted_words.append(word)
+        
+        return ' '.join(converted_words)
+    else:
+        # Single word - apply basic rules
+        if name.endswith('а'):
+            return name[:-1] + 'ы'
+        elif name.endswith('я'):
+            return name[:-1] + 'и'
+        elif name.endswith('ь'):
+            return name[:-1] + 'и'
+        elif name.endswith('й'):
+            return name[:-1] + 'я'
+        else:
+            return name + 'а'
+
 def add_formatted_paragraph(doc, text, bold=False, alignment=WD_ALIGN_PARAGRAPH.LEFT):
     """Add a paragraph with consistent Times New Roman 11pt formatting"""
     para = doc.add_paragraph()
