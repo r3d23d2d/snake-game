@@ -321,6 +321,7 @@ class ContractNew(BaseModel):
     contract_start_date: str  # Current date
     contract_end_date: str
     contract_end_month: str
+    contract_end_year: str  # Add year field
     contract_content: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
