@@ -901,6 +901,7 @@ async def create_contract(contract: ContractCreate):
         service_cost_words=contract.service_cost_words,
         contract_end_date=contract.contract_end_date,
         contract_end_month=contract.contract_end_month,
+        contract_end_year="2025",  # Default year for legacy contracts
         client_details=client_details,
         client_signature=client_name_in_contract
     )
