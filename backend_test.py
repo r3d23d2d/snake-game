@@ -928,7 +928,47 @@ class ContractSystemTester:
 
 def main():
     print("🚀 Starting Contract Management System Backend Tests")
-    print("=" * 60)
+    print("=" * 80)
+    
+    # Test new direct contract functionality first
+    print("\n" + "=" * 80)
+    print("🆕 TESTING NEW DIRECT CONTRACT FUNCTIONALITY")
+    print("=" * 80)
+    
+    direct_tester = DirectContractTester()
+    
+    # Direct contract test sequence
+    direct_test_sequence = [
+        ("Number to Words Conversion", direct_tester.test_number_to_words_conversion),
+        ("Contract Number Generation", direct_tester.test_contract_number_generation),
+        ("Contract End Date Calculation", direct_tester.test_contract_end_date_calculation),
+        ("Direct Contract Creation", direct_tester.test_direct_contract_creation),
+        ("Contract Retrieval", direct_tester.test_contract_retrieval),
+        ("Contract Updates", direct_tester.test_contract_updates),
+        ("Word Download", direct_tester.test_word_download),
+    ]
+    
+    # Run direct contract tests
+    for test_name, test_func in direct_test_sequence:
+        try:
+            test_func()
+        except Exception as e:
+            print(f"❌ Test '{test_name}' failed with exception: {str(e)}")
+    
+    # Cleanup direct contracts
+    direct_tester.cleanup_contracts()
+    
+    # Print direct contract test results
+    print("\n" + "=" * 80)
+    print(f"📊 Direct Contract Test Results:")
+    print(f"   Tests run: {direct_tester.tests_run}")
+    print(f"   Tests passed: {direct_tester.tests_passed}")
+    print(f"   Success rate: {(direct_tester.tests_passed/direct_tester.tests_run*100):.1f}%")
+    
+    # Test legacy functionality
+    print("\n" + "=" * 80)
+    print("🔄 TESTING LEGACY CONTRACT FUNCTIONALITY")
+    print("=" * 80)
     
     tester = ContractSystemTester()
     
@@ -941,8 +981,8 @@ def main():
         ("Create Contract", tester.test_create_contract),
         ("Get All Contracts", tester.test_get_contracts),
         ("Get Contract by ID", tester.test_get_contract_by_id),
-        ("Download Contract Word", tester.test_download_contract_word),  # NEW TEST
-        ("Kozlov Client & Contract Test", tester.test_create_petrov_client_and_contract),  # REVIEW REQUEST TEST
+        ("Download Contract Word", tester.test_download_contract_word),
+        ("Kozlov Client & Contract Test", tester.test_create_petrov_client_and_contract),
         ("Create Minimal Client", tester.test_create_minimal_client),
         ("Delete Contract", tester.test_delete_contract),
         ("Delete Client", tester.test_delete_client),
@@ -955,14 +995,24 @@ def main():
         except Exception as e:
             print(f"❌ Test '{test_name}' failed with exception: {str(e)}")
     
-    # Print final results
-    print("\n" + "=" * 60)
-    print(f"📊 Backend Test Results:")
+    # Print legacy test results
+    print("\n" + "=" * 80)
+    print(f"📊 Legacy Contract Test Results:")
     print(f"   Tests run: {tester.tests_run}")
     print(f"   Tests passed: {tester.tests_passed}")
     print(f"   Success rate: {(tester.tests_passed/tester.tests_run*100):.1f}%")
     
-    if tester.tests_passed == tester.tests_run:
+    # Combined results
+    total_tests = direct_tester.tests_run + tester.tests_run
+    total_passed = direct_tester.tests_passed + tester.tests_passed
+    
+    print("\n" + "=" * 80)
+    print(f"📊 OVERALL TEST RESULTS:")
+    print(f"   Total tests run: {total_tests}")
+    print(f"   Total tests passed: {total_passed}")
+    print(f"   Overall success rate: {(total_passed/total_tests*100):.1f}%")
+    
+    if total_passed == total_tests:
         print("🎉 All backend tests passed!")
         return 0
     else:
