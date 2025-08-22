@@ -444,6 +444,7 @@ def main():
         ("Get All Contracts", tester.test_get_contracts),
         ("Get Contract by ID", tester.test_get_contract_by_id),
         ("Download Contract Word", tester.test_download_contract_word),  # NEW TEST
+        ("Petrov Client & Contract Test", tester.test_create_petrov_client_and_contract),  # REVIEW REQUEST TEST
         ("Create Minimal Client", tester.test_create_minimal_client),
         ("Delete Contract", tester.test_delete_contract),
         ("Delete Client", tester.test_delete_client),
