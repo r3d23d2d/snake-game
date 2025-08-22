@@ -164,7 +164,7 @@ function App() {
       
       toast({
         title: "Успешно",
-        description: "Редактированный договор скачан в формате Word",
+        description: "Договор скачан в формате Word",
       });
     } catch (error) {
       console.error('Error downloading custom contract:', error);
