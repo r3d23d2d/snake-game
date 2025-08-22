@@ -356,6 +356,10 @@ class ContractCreate(BaseModel):
     contract_end_date: str
     contract_end_month: str
 
+class ContractContentUpdate(BaseModel):
+    """Model for updating only the contract content text"""
+    contract_content: str
+
 def add_formatted_paragraph(doc, text, bold=False, alignment=WD_ALIGN_PARAGRAPH.LEFT):
     """Add a paragraph with consistent Times New Roman 11pt formatting"""
     para = doc.add_paragraph()
