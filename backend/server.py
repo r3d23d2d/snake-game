@@ -91,6 +91,11 @@ def number_to_words_ru(num):
         remainder = num % 1000000
         if remainder > 0:
             result += " " + number_to_words_ru(remainder)
+        else:
+            # Add ruble case for millions without remainder
+            ruble_forms = ["", "рубль", "рубля", "рублей"]
+            ruble_case = get_case_for_number(num, ruble_forms)
+            result += f" {ruble_case}"
         
         return result
     
@@ -110,6 +115,11 @@ def number_to_words_ru(num):
         remainder = num % 1000
         if remainder > 0:
             result += " " + number_to_words_ru(remainder)
+        else:
+            # Add ruble case for thousands without remainder
+            ruble_forms = ["", "рубль", "рубля", "рублей"]
+            ruble_case = get_case_for_number(num, ruble_forms)
+            result += f" {ruble_case}"
         
         return result
     
