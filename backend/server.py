@@ -715,6 +715,7 @@ async def create_contract_direct(contract_data: ContractData):
         contract_start_date=now.strftime('%d.%m.%Y'),
         contract_end_date=end_date,
         contract_end_month=end_month,
+        contract_end_year=end_year,
         contract_content=contract_content
     )
     
