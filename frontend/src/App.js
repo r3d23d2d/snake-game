@@ -17,6 +17,8 @@ function App() {
   const [currentContract, setCurrentContract] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingContent, setIsEditingContent] = useState(false);
+  const [editedContent, setEditedContent] = useState('');
   const { toast } = useToast();
 
   // Contract form state
