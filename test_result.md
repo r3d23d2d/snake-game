@@ -265,6 +265,21 @@ backend:
           agent: "testing"
           comment: "✅ TESTED: Section 11 formatting improvements working correctly. Section 11 'ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' now starts on a new page with proper page break. Executor details are compacted but still include all essential information (ИП details, address, INN, OGRNIP, bank details). Document structure and formatting maintained."
 
+  - task: "Contract content editing endpoints"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "New endpoints for contract content editing requested: PUT /api/contracts/direct/{id}/content and GET /api/contracts/direct/{id}/download_custom"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Contract content editing endpoints working correctly. PUT /api/contracts/direct/{id}/content successfully updates contract content and persists to database. GET /api/contracts/direct/{id}/download_custom generates Word documents with custom edited content. ContractContentUpdate model validates input correctly. Tested with various content types including special characters and long text. Minor: Empty content validation not implemented but acceptable behavior. All core functionality working as requested."
+
 frontend:
   - task: "Create single page layout instead of tabs"
     implemented: true
