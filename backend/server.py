@@ -785,6 +785,7 @@ async def update_contract_direct(contract_id: str, contract_data: ContractData):
         "service_cost_words": service_cost_words,
         "contract_end_date": end_date,
         "contract_end_month": end_month,
+        "contract_end_year": end_year,
         "contract_content": contract_content,
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
