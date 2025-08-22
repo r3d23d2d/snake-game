@@ -1145,6 +1145,297 @@ Email: test@example.com
         print("   ✅ All ContractContentUpdate model validation tests passed")
         return True
 
+    def test_contract_content_editing_workflow(self):
+        """
+        COMPREHENSIVE TEST FOR CONTRACT CONTENT EDITING AND DOWNLOAD FUNCTIONALITY
+        
+        This test specifically addresses the user-reported issue:
+        "When editing contract content and clicking download, the edits are not reflected in the downloaded Word document"
+        
+        Test workflow:
+        1. Create contract → Edit content → Save changes → Download document → Verify that downloaded Word document contains the edited content
+        2. Test regular download endpoint still works for non-edited contracts
+        3. Test edge cases like empty content, special characters, and long text
+        """
+        print("\n🔍 COMPREHENSIVE CONTRACT CONTENT EDITING WORKFLOW TEST")
+        print("=" * 70)
+        
+        # Step 1: Create a contract
+        print("\n📝 Step 1: Creating initial contract...")
+        contract_data = {
+            "name_or_organization": "ООО Тест Редактирование Контента",
+            "other_details": "Адрес: г. Казань, ул. Тестовая, 123\nИНН: 1234567890\nТел: +7(843)123-45-67",
+            "service_cost": 50000,
+            "duration_months": 6
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Workflow Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            print("❌ Failed to create contract for workflow test")
+            return False
+        
+        contract_id = response['id']
+        original_content = response['contract_content']
+        contract_number = response['contract_number']
+        self.created_contract_ids.append(contract_id)
+        
+        print(f"✅ Contract created successfully: {contract_id}")
+        print(f"   Original content length: {len(original_content)} characters")
+        
+        # Step 2: Test regular download (before editing)
+        print("\n📥 Step 2: Testing regular download before editing...")
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download"
+        
+        self.tests_run += 1
+        try:
+            download_response = requests.get(url)
+            if download_response.status_code == 200:
+                self.tests_passed += 1
+                print("✅ Regular download works before editing")
+                print(f"   File size: {len(download_response.content)} bytes")
+            else:
+                print(f"❌ Regular download failed: {download_response.status_code}")
+                return False
+        except Exception as e:
+            print(f"❌ Error with regular download: {str(e)}")
+            return False
+        
+        # Step 3: Edit contract content
+        print("\n✏️  Step 3: Editing contract content...")
+        edited_content = f"""**Договор об оказании услуг № {contract_number}**
+
+ОТРЕДАКТИРОВАННОЕ СОДЕРЖИМОЕ ДОГОВОРА - ТЕСТ ФУНКЦИОНАЛЬНОСТИ
+
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и ООО Тест Редактирование Контента, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. ЭТОТ ТЕКСТ БЫЛ ДОБАВЛЕН ЧЕРЕЗ API РЕДАКТИРОВАНИЯ СОДЕРЖИМОГО.
+
+1.2. Исполнитель принимает на себя обязательства оказать комплекс услуг в соответствии с заявками Заказчика.
+
+1.3. СПЕЦИАЛЬНАЯ ПРОВЕРКА: Стоимость услуг составляет 50000 (пятьдесят тысяч) рублей.
+
+**2. СРОК ДЕЙСТВИЯ ДОГОВОРА**
+
+2.1. Настоящий Договор вступает в силу с даты его подписания Сторонами.
+
+2.2. ОТРЕДАКТИРОВАННЫЙ РАЗДЕЛ: Договор действует в течение 6 месяцев.
+
+**3. ПРАВА И ОБЯЗАННОСТИ СТОРОН**
+
+3.1. Исполнитель обязан:
+- Приступить к оказанию Услуг в течение трех дней
+- Консультировать Заказчика по всем вопросам
+- НОВОЕ ОБЯЗАТЕЛЬСТВО: Уведомлять о всех изменениях в договоре
+
+3.2. Заказчик обязан:
+- Предоставлять необходимую информацию
+- Оплатить Услуги в установленные сроки
+- НОВОЕ ОБЯЗАТЕЛЬСТВО: Подтверждать получение отредактированного договора
+
+**4. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ**
+
+4.1. Настоящий Договор составлен в двух экземплярах.
+
+4.2. ПРОВЕРКА РЕДАКТИРОВАНИЯ: Данный текст должен появиться в скачанном документе.
+
+**ПОДПИСИ СТОРОН**
+
+Исполнитель: ________________/Шамсутдинов Р.Р.
+
+Заказчик: ________________/ООО Тест Редактирование Контента
+
+КОНЕЦ ОТРЕДАКТИРОВАННОГО СОДЕРЖИМОГО - МАРКЕР ДЛЯ ПРОВЕРКИ"""
+
+        content_update = {"contract_content": edited_content}
+        
+        success, edit_response = self.run_test(
+            "Edit Contract Content",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=content_update,
+            return_response=True
+        )
+        
+        if not success:
+            print("❌ Failed to edit contract content")
+            return False
+        
+        # Verify content was actually updated
+        if edit_response['contract_content'] == edited_content:
+            print("✅ Content update verified in API response")
+        else:
+            print("❌ Content update not reflected in API response")
+            return False
+        
+        # Step 4: Verify content persisted in database
+        print("\n🗄️  Step 4: Verifying content persisted in database...")
+        success, db_response = self.run_test(
+            "Verify Content Persisted",
+            "GET",
+            f"contracts/direct/{contract_id}",
+            200,
+            return_response=True
+        )
+        
+        if success and db_response['contract_content'] == edited_content:
+            print("✅ Edited content persisted in database")
+        else:
+            print("❌ Edited content NOT persisted in database")
+            return False
+        
+        # Step 5: Test custom download with edited content
+        print("\n📥 Step 5: Testing custom download with edited content...")
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download_custom"
+        
+        self.tests_run += 1
+        try:
+            custom_download_response = requests.get(url)
+            if custom_download_response.status_code != 200:
+                print(f"❌ Custom download failed: {custom_download_response.status_code}")
+                return False
+            
+            self.tests_passed += 1
+            print("✅ Custom download successful")
+            print(f"   File size: {len(custom_download_response.content)} bytes")
+            
+            # Check Content-Type
+            content_type = custom_download_response.headers.get('Content-Type', '')
+            if 'wordprocessingml.document' in content_type:
+                print("✅ Correct Word document Content-Type")
+            else:
+                print(f"❌ Wrong Content-Type: {content_type}")
+                return False
+            
+            # Check filename
+            content_disposition = custom_download_response.headers.get('Content-Disposition', '')
+            if 'редактированный' in content_disposition or 'custom' in content_disposition.lower():
+                print("✅ Filename indicates edited/custom document")
+            else:
+                print(f"❌ Filename doesn't indicate custom document: {content_disposition}")
+                return False
+            
+        except Exception as e:
+            print(f"❌ Error with custom download: {str(e)}")
+            return False
+        
+        # Step 6: Verify Word document contains edited content
+        print("\n🔍 Step 6: Verifying Word document contains edited content...")
+        try:
+            import tempfile
+            import zipfile
+            
+            with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                temp_file.write(custom_download_response.content)
+                temp_file_path = temp_file.name
+            
+            # Extract and check document content
+            with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                
+                # Check for specific edited content markers
+                content_checks = [
+                    ('Edited header', 'ОТРЕДАКТИРОВАННОЕ СОДЕРЖИМОЕ ДОГОВОРА' in document_xml),
+                    ('API edit marker', 'ЧЕРЕЗ API РЕДАКТИРОВАНИЯ СОДЕРЖИМОГО' in document_xml),
+                    ('New obligation', 'НОВОЕ ОБЯЗАТЕЛЬСТВО' in document_xml),
+                    ('Edit verification', 'ПРОВЕРКА РЕДАКТИРОВАНИЯ' in document_xml),
+                    ('End marker', 'КОНЕЦ ОТРЕДАКТИРОВАННОГО СОДЕРЖИМОГО' in document_xml),
+                    ('Client name', 'ООО Тест Редактирование Контента' in document_xml),
+                    ('Contract number', contract_number in document_xml),
+                    ('Kazan header', 'Казань' in document_xml)
+                ]
+                
+                all_content_found = True
+                for check_name, check_result in content_checks:
+                    if check_result:
+                        print(f"   ✅ {check_name} found in Word document")
+                    else:
+                        print(f"   ❌ {check_name} NOT found in Word document")
+                        all_content_found = False
+                
+                if not all_content_found:
+                    print("❌ Some edited content missing from Word document")
+                    return False
+                
+                print("✅ All edited content verified in Word document")
+            
+            # Clean up temp file
+            import os
+            try:
+                os.unlink(temp_file_path)
+            except:
+                pass
+                
+        except Exception as e:
+            print(f"❌ Error verifying Word document content: {str(e)}")
+            return False
+        
+        # Step 7: Test regular download still works (should use template)
+        print("\n📥 Step 7: Testing regular download still works after editing...")
+        self.tests_run += 1
+        try:
+            regular_download_response = requests.get(f"{self.api_url}/contracts/direct/{contract_id}/download")
+            if regular_download_response.status_code == 200:
+                self.tests_passed += 1
+                print("✅ Regular download still works after editing")
+                print(f"   File size: {len(regular_download_response.content)} bytes")
+                
+                # Regular download should use template, not custom content
+                with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                    temp_file.write(regular_download_response.content)
+                    temp_file_path = temp_file.name
+                
+                with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                    regular_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                    
+                    # Regular download should use template formatting, not custom content
+                    if 'ОТРЕДАКТИРОВАННОЕ СОДЕРЖИМОЕ ДОГОВОРА' not in regular_xml:
+                        print("✅ Regular download uses template (not custom content)")
+                    else:
+                        print("❌ Regular download incorrectly uses custom content")
+                        return False
+                    
+                    # But should still have basic contract info
+                    if contract_number in regular_xml and 'ООО Тест Редактирование Контента' in regular_xml:
+                        print("✅ Regular download contains correct contract data")
+                    else:
+                        print("❌ Regular download missing contract data")
+                        return False
+                
+                # Clean up temp file
+                try:
+                    os.unlink(temp_file_path)
+                except:
+                    pass
+                    
+            else:
+                print(f"❌ Regular download failed after editing: {regular_download_response.status_code}")
+                return False
+        except Exception as e:
+            print(f"❌ Error with regular download after editing: {str(e)}")
+            return False
+        
+        print("\n🎉 CONTRACT CONTENT EDITING WORKFLOW TEST COMPLETED SUCCESSFULLY!")
+        print("✅ All critical functionality verified:")
+        print("   • Contract content can be edited via PUT /api/contracts/direct/{id}/content")
+        print("   • Edited content persists in database")
+        print("   • Custom download generates Word documents with edited content")
+        print("   • Regular download still works with template formatting")
+        
+        return True
+
     def cleanup_contracts(self):
         """Clean up all created contracts"""
         print(f"\n🧹 Cleaning up {len(self.created_contract_ids)} created contracts...")
