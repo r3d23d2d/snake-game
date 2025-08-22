@@ -381,6 +381,14 @@ def create_word_contract(contract_data):
     style.font.name = 'Times New Roman'
     style.font.size = Pt(11)
     
+    # Title (first element, larger font)
+    title_para = doc.add_paragraph()
+    title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    title_run = title_para.add_run(f"Договор об оказании услуг № {contract_data['contract_number']}")
+    title_run.bold = True
+    title_run.font.name = 'Times New Roman'
+    title_run.font.size = Pt(14)  # Larger font size
+    
     # Header with Kazan (left) and contract signing date (right)
     header_para = doc.add_paragraph()
     header_para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
@@ -411,12 +419,6 @@ def create_word_contract(contract_data):
     
     # Empty line after header
     doc.add_paragraph()
-    
-    # Title
-    add_formatted_paragraph(doc, 
-        f"Договор об оказании услуг № {contract_data['contract_number']}", 
-        bold=True, 
-        alignment=WD_ALIGN_PARAGRAPH.CENTER)
     
     # Contract parties
     add_formatted_paragraph(doc, 
