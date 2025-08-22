@@ -4,7 +4,7 @@ import json
 
 def test_number_to_words_fix():
     """Test the fixed number-to-words conversion for thousands and millions"""
-    base_url = "https://docuforge-4.preview.emergentagent.com"
+    base_url = "https://contractify.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     test_cases = [
@@ -47,7 +47,7 @@ def test_number_to_words_fix():
 
 def test_word_download_fix():
     """Test the fixed Word download with Cyrillic filename"""
-    base_url = "https://docuforge-4.preview.emergentagent.com"
+    base_url = "https://contractify.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("\n🔍 Testing Fixed Word Download...")
@@ -113,7 +113,7 @@ def test_word_download_fix():
 
 def test_legacy_contract_creation():
     """Test the fixed legacy contract creation endpoint"""
-    base_url = "https://docuforge-4.preview.emergentagent.com"
+    base_url = "https://contractify.preview.emergentagent.com"
     api_url = f"{base_url}/api"
     
     print("\n🔍 Testing Fixed Legacy Contract Creation...")

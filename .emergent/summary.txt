@@ -1,30 +1,32 @@
 <analysis>
-The AI engineer successfully transitioned the contract management application from a client-centric model to a pure contract generation service. Initial work involved understanding the existing codebase and the new user requirements for a unified page with dynamic contract fields. Key changes included adding a 'cost' field, auto-generating the 'cost in words', dynamically calculating 'contract end date' (month, half-year, year options, default half-year), and automatically generating contract numbers based on creation date. Critically, client saving functionality was removed. The backend was refactored in  to incorporate these new fields, implement number-to-words conversion and date calculations, and update API endpoints for direct contract generation and download. After thorough backend testing, the frontend  was completely rewritten for a single-page interface. User feedback then focused on precise Word document formatting, leading to further iterative refinements in the  function in  to match specific font (Times New Roman, size 11), page limits (3 pages), and signature alignment.
+The AI engineer successfully transformed the application from a client-centric model to a pure contract generation service on a unified page. Initial development included dynamic contract fields (cost, auto-generated cost in words, end date, contract number) and removal of client saving. The backend () was extensively refactored for these features, including number-to-words and date calculations, while the frontend () was rewritten. Throughout this trajectory, the AI refined the solution based on specific user feedback. This involved correcting contract end date calculations for half-year durations, applying detailed Word document formatting (Kazan/date, Section 11 on new page, compact requisite line spacing, prominent contract title), and synchronizing all date generations and calculations to Moscow time (UTC+3) for local accuracy. Backend tests passed, but frontend validation and the implementation of a document editing/saving feature are still pending.
 </analysis>
 
 <product_requirements>
-The initial product was a contract management service with a default contract template, client data fields, and the ability to auto-populate customer sections. Enhancements included downloading contracts in Word format (preserving structure) and simplifying the client form to Name/organization name and Other data.
-
-The new user requirements drastically shifted the focus:
-1.  **Unified Page:** The application should operate on a single page.
-2.  **Contract Fields:**
-    *   Add a Стоимость (Cost) field.
-    *   Automatically generate Стоимость прописью (Cost in words) without a dedicated input field.
-    *   Add a Дата окончания договора (Contract End Date) field with options: month, half-year, year (defaulting to half-year).
-    *   Automatically generate Номер договора (Contract Number) based on the creation date (e.g., № КР22.08.25).
-3.  **Contract Display & Interaction:** Upon creation, the contract should appear below the form, viewable, editable, and downloadable.
-4.  **Client Management Removal:** The saving clients functionality is no longer needed.
-5.  **Word Document Formatting (Post-development feedback):** The downloaded Word document must adhere to specific formatting: Times New Roman, size 11, fit within 3 pages, and maintain signature fields at a consistent level.
+The application, originally a contract management service, has shifted to a contract generation-focused service on a single, unified page.
+**Original Requirements:**
+*   **Unified Page:** Single-page operation.
+*   **Contract Fields:** Стоимость (Cost) with auto-generated Стоимость прописью (Cost in words); Дата окончания договора (Contract End Date) with month, half-year, year options (default half-year); auto-generated Номер договора (Contract Number) based on creation date.
+*   **Contract Display & Interaction:** View, implicit edit, and download upon creation.
+*   **Client Management Removal:** Deprecate client saving.
+*   **Word Document Formatting:** Times New Roman, size 11, fit within 3 pages, consistent signature alignment.
+**New Requirements (from trajectory):**
+*   **Document Header:** Add Казань (Kazan) on the top left and automatically populate the contract signing date on the top right.
+*   **End Date Correction:** Fix incorrect half-year duration calculation (e.g., 2025 vs. 2026).
+*   **Section 11 Formatting:** ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН must start on a new page, with compact line spacing (original content), maintaining aligned signature lines.
+*   **Title Prominence:** Contract title (e.g., Договор об оказании услуг № КР22.08.25) should be at the very top with a larger font.
+*   **Time Zone:** All generated dates (signing, number, start, end) must use Moscow time (UTC+3).
+*   **Document Edit/Save:** Enable editing and saving the final generated Word document.
 </product_requirements>
 
 <key_technical_concepts>
--   **FastAPI**: Python web framework.
--   **React**: JavaScript library for UI.
--   **MongoDB**: NoSQL database.
--   **python-docx**: Python library for Word document generation, now with advanced formatting.
--   **Pydantic**: Data validation for Python models.
--   **Number-to-Words Conversion**: Custom Python function for Russian currency.
--   **Date Calculation**: Python logic for contract end dates.
+-   **FastAPI**: Python web framework for backend APIs.
+-   **React**: JavaScript library for single-page user interface.
+-   **MongoDB**: NoSQL database for data persistence.
+-   **python-docx**: Python library for advanced Word document generation and formatting.
+-   **Pydantic**: Data validation and serialization for Python models.
+-   **Date/Time Handling**: Python's  and  for accurate time zone-aware calculations.
+-   **Number-to-Words Conversion**: Custom Python logic for Russian currency representation.
 </key_technical_concepts>
 
 <code_architecture>
@@ -34,52 +36,46 @@ The application uses a standard full-stack architecture with a React frontend, F
 
 
 -   **/app/backend/server.py**:
-    -   **Importance**: Core of the FastAPI backend, defining API endpoints, database interactions, and business logic.
+    -   **Importance**: Centralizes FastAPI routes, database interactions, and the business logic for contract generation, including number-to-words conversion, date calculations, and Word document formatting.
     -   **Changes Made**:
-        -   **Word Download & Simplified Client (Previous Work)**: Integrated , modified  model (name/org, other details), and updated related CRUD.
-        -   **New Contract Generation Logic**:
-            -   Added  function for converting numbers to Russian text.
-            -   Added  function based on duration (month, half-year, year).
-            -   Removed client-related models and endpoints (implicitly, by shifting focus).
-            -   Introduced  Pydantic model with , , , .
-            -   Modified the default  to include placeholders for  and .
-            -   Added new endpoints:
-                -    (POST): Creates a new contract with auto-generated number, end date, and cost in words.
-                -    (GET): Retrieves a specific contract.
-                -    (GET): Downloads the generated Word document.
-            -   Refactored  function:
-                -   Updated to use new contract data model and auto-generated fields.
-                -   Iteratively refined to apply specific formatting (Times New Roman, size 11), manage page breaks to fit content into 3 pages, and ensure signature alignment using a helper function .
-
+        -   **Date Calculation Logic**: The  function was updated to accurately determine the  across year boundaries, resolving issues with half-year durations.
+        -   **Pydantic Models**:  (and potentially ) Pydantic models were modified to correctly integrate .
+        -   **Word Document Generation ()**:
+            -   Modified to include Казань (top-left) and the Moscow-time signing date (top-right) in the document header.
+            -   Added logic to force Section 11 (ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН) onto a new page.
+            -   Reverted previous content-compacting changes for requisites, instead applying compact line spacing (,  set to ) while preserving original content and signature alignment.
+            -   The contract title (e.g., Договор об оказании услуг № КР...) was moved to the document's absolute top, increased to 14pt font, and retained bold/centered styling.
+        -   **Time Zone Handling**: All  calls for contract generation (signing date, contract number, start date, and ) were updated to use  for Moscow time;  was imported from .
 -   **/app/frontend/src/App.js**:
-    -   **Importance**: Main React component for UI, forms, and display.
+    -   **Importance**: Serves as the primary React component for the user interface, handling form inputs for contract details, displaying the generated contract, and triggering download actions.
     -   **Changes Made**:
-        -   **Initial Build & Word Download (Previous Work)**: Basic UI for clients/contracts, added download button.
-        -   **Complete Rewrite for Unified Page**: Replaced entirely to implement a single-page application. This new structure integrates the input form (Name/Organization, Other Data, Cost, Contract Duration) and dynamically displays the generated contract below, enabling viewing, editing (implicit, given display), and downloading. It now interacts with the new  endpoint.
-
+        -   Updated to correctly reflect and display the  based on backend calculations. It interfaces with the backend API endpoint . Visual adjustments for the new header/title formatting in the displayed contract are implied but require frontend testing.
 -   **/app/backend/requirements.txt**:
-    -   **Importance**: Lists Python dependencies.
-    -   **Changes Made**:  was already added, no new explicit additions in this trajectory.
-
+    -   **Importance**: Manages Python project dependencies.
+    -   **Changes Made**: No explicit modifications were mentioned for this file in the trajectory.
 -   **/app/frontend/.env & /app/backend/.env**:
-    -   **Importance**: Environment variables.
-    -   **Changes Made**: No direct modifications.
-
+    -   **Importance**: Stores environment-specific variables like API URLs and database connections.
+    -   **Changes Made**: No direct modifications were made to these  files.
 </code_architecture>
 
 <pending_tasks>
-- No pending tasks were explicitly discussed or left incomplete in the provided trajectory *before* the current work.
-- The immediate pending task is to ensure the frontend displays the new contract fields and interacts correctly with the new backend API, and importantly, that the Word document formatting (font, size, page count, signature alignment) is correct and meets user expectations.
+-   **Frontend Validation**: Verify the UI display of contract fields, and confirm the generated Word document's visual adherence to all new formatting rules (Kazan/Date, title font, compact requisite line spacing, Section 11 new page, signature alignment).
+-   **Document Editing and Saving**: Implement the capability for users to edit and then save the final generated Word document.
 </pending_tasks>
 
 <current_work>
-The system is currently undergoing a significant overhaul to transform into a contract generation-focused service on a single, unified page, deprecating the client saving functionality. The backend () has been extensively modified. It now includes a  function for Russian number-to-text conversion for the cost field, and a  function to determine contract termination based on user-selected duration (month, half-year, year). New API endpoints (, , ) have been implemented to support direct contract creation and retrieval without prior client saving. The contract template now dynamically injects a creation-date-based contract number and the calculated end date.
+The application is being transformed into a single-page contract generation service, with client saving functionality removed. The backend () has been significantly modified. It includes  for Russian cost conversion and  for contract termination. New API endpoints (, etc.) facilitate direct contract creation. The  function has undergone multiple iterations to comply with detailed Word document formatting feedback.
 
-Crucially, the  function has been iteratively refactored to address detailed user feedback on Word document formatting. It now uses an  helper to ensure all generated text adheres to Times New Roman, size 11, and includes logic to manage content flow to fit the entire document within 3 pages, with signature fields consistently aligned.
+Most recently, the AI engineer addressed several user-specific requirements:
+1.  **Date Calculation Correction**: Fixed the  logic, particularly for half-year duration, by ensuring the  is accurately calculated and reflected in the Pydantic models and template.
+2.  **Word Document Header and Section 11**: Implemented Казань on the top left and the signing date on the top right of the document. Section 11 (ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН) now starts on a new page.
+3.  **Requisite Formatting Refinement**: After an initial attempt to compact requisite *content*, the AI reverted to the original full requisites, instead compacting the *line spacing* and maintaining signature alignment.
+4.  **Contract Title Prominence**: The contract title with its number () has been moved to the very top of the document and its font size increased to 14pt, while remaining bold and centered.
+5.  **Time Zone Synchronization**: All date-related operations—including the contract signing date, generation of the contract number, calculation of the contract end date, and the contract start date—have been standardized to Moscow time (UTC+3) to ensure local accuracy for Kazan. Necessary  import was added to .
 
-The backend has been successfully tested. The frontend () has been completely rewritten to provide a single-page experience, integrating input fields for Name/Organization, Other Data, Cost, and Contract Duration. Upon submission, it will interact with the new  endpoint, and is expected to display the generated contract and provide download options. The AI engineer is currently in the process of thoroughly testing the frontend, particularly the Word document generation feature for adherence to the new formatting rules.
+Backend modifications have been successfully tested. The frontend () was updated to display the correct end year. However, comprehensive frontend validation of the visual document changes is still required, and the user's request for editing and saving the final document remains a significant pending feature.
 </current_work>
 
 <optional_next_step>
-Test the updated frontend to verify the new contract generation form, display, and especially the Word document formatting (font, size, page count, signature alignment).
+Request user permission for comprehensive frontend testing to validate all visual and date-related changes in the generated Word document, and then plan for the editing and saving feature.
 </optional_next_step>
