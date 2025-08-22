@@ -176,7 +176,8 @@ function App() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Договор_Редактированный_${currentContract.client_name.replace(/\s+/g, '_')}.docx`;
+      // Filename will be set by backend Content-Disposition header
+      link.download = `Договор для ${currentContract.client_name} (редактированный).docx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
