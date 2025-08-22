@@ -28,14 +28,6 @@ function App() {
     duration_months: 6
   });
 
-  // Edit contract state
-  const [editForm, setEditForm] = useState({
-    name_or_organization: '',
-    other_details: '',
-    service_cost: '',
-    duration_months: 6
-  });
-
   // Auto-generate cost in words when service_cost changes
   const [serviceCostWords, setServiceCostWords] = useState('');
 
