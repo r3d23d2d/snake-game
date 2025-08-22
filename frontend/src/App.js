@@ -174,43 +174,6 @@ function App() {
     }
   };
 
-  const downloadContract = async () => {
-    if (!currentContract) return;
-    
-    try {
-      const response = await axios.get(`${API}/contracts/direct/${currentContract.id}/download`, {
-        responseType: 'blob'
-      });
-      
-      // Create blob and download
-      const blob = new Blob([response.data], {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      });
-      
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      // Filename will be set by backend Content-Disposition header
-      link.download = `Договор для ${currentContract.client_name}.docx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Успешно",
-        description: "Договор скачан в формате Word",
-      });
-    } catch (error) {
-      console.error('Error downloading contract:', error);
-      toast({
-        title: "Ошибка",
-        description: "Не удалось скачать договор",
-        variant: "destructive",
-      });
-    }
-  };
-
   const resetContract = () => {
     setCurrentContract(null);
     setIsEditingContent(false);
