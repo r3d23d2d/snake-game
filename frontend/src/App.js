@@ -301,30 +301,18 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-slate-800 mb-2 font-serif">
-              Создание договора об оказании услуг
-            </h1>
-            <p className="text-slate-600 text-lg">
-              Создание и редактирование договоров об оказании услуг
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Contract Form */}
+        <div className="max-w-4xl mx-auto">
+          
+          {/* If no contract exists, show form */}
+          {!currentContract && (
             <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-slate-800">
                   <FileText className="w-5 h-5 text-blue-600" />
-                  {currentContract ? "Создать новый договор" : "Создание договора"}
+                  Создание договора
                 </CardTitle>
                 <CardDescription>
-                  {currentContract 
-                    ? "Заполните данные для создания нового договора"
-                    : "Заполните данные клиента и параметры договора"
-                  }
+                  Заполните данные клиента и параметры договора
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -403,222 +391,81 @@ function App() {
                   >
                     {loading ? 'Создание договора...' : 'Создать договор'}
                   </Button>
-
-                  {currentContract && (
-                    <Button 
-                      type="button"
-                      onClick={resetContract}
-                      variant="outline"
-                      className="w-full mt-2"
-                    >
-                      Очистить форму
-                    </Button>
-                  )}
                 </form>
               </CardContent>
             </Card>
+          )}
 
-            {/* Contract Display */}
-            {currentContract && (
-              <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <div className="flex justify-between items-start">
+          {/* If contract exists, show simplified view */}
+          {currentContract && (
+            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+              <CardContent className="p-8">
+                {isEditingContent ? (
+                  <div className="space-y-4">
                     <div>
-                      <CardTitle className="flex items-center gap-2 text-slate-800">
-                        <FileText className="w-5 h-5 text-green-600" />
-                        {currentContract.contract_number}
-                      </CardTitle>
-                      <CardDescription>
-                        Договор создан: {new Date(currentContract.created_at).toLocaleDateString('ru-RU')}
-                      </CardDescription>
+                      <Label className="text-slate-700 font-medium mb-2 block">
+                        Редактирование текста договора
+                      </Label>
+                      <Textarea
+                        value={editedContent}
+                        onChange={(e) => setEditedContent(e.target.value)}
+                        className="border-slate-200 focus:border-purple-500 resize-none min-h-[400px] font-mono text-sm"
+                        placeholder="Введите текст договора..."
+                      />
                     </div>
+
                     <div className="flex gap-2">
-                      {!isEditing && !isEditingContent && (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleEditContract}
-                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                            title="Редактировать параметры"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleEditContent}
-                            className="text-purple-600 border-purple-200 hover:bg-purple-50"
-                            title="Редактировать текст договора"
-                          >
-                            <FileEdit className="w-4 h-4" />
-                          </Button>
-                        </>
-                      )}
                       <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={isEditingContent ? downloadCustomContract : downloadContract}
-                        className="text-green-600 border-green-200 hover:bg-green-50"
-                        title={isEditingContent ? "Скачать редактированный договор" : "Скачать Word"}
+                        onClick={handleSaveContent}
+                        disabled={loading}
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
                       >
-                        <Download className="w-4 h-4" />
+                        <Save className="w-4 h-4 mr-2" />
+                        {loading ? 'Сохранение...' : 'Сохранить изменения'}
+                      </Button>
+                      <Button
+                        onClick={() => setIsEditingContent(false)}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        <X className="w-4 h-4 mr-2" />
+                        Отмена
                       </Button>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  {isEditingContent ? (
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-slate-700 font-medium mb-2 block">
-                          Редактирование текста договора
-                        </Label>
-                        <Textarea
-                          value={editedContent}
-                          onChange={(e) => setEditedContent(e.target.value)}
-                          className="border-slate-200 focus:border-purple-500 resize-none min-h-[400px] font-mono text-sm"
-                          placeholder="Введите текст договора..."
-                        />
-                        <p className="text-xs text-slate-500 mt-1">
-                          Отредактируйте текст договора. Изменения будут сохранены и применены к Word документу.
-                        </p>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={handleSaveContent}
-                          disabled={loading}
-                          className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          {loading ? 'Сохранение...' : 'Сохранить изменения'}
-                        </Button>
-                        <Button
-                          onClick={() => setIsEditingContent(false)}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          Отмена
-                        </Button>
-                      </div>
+                ) : (
+                  <div className="text-center space-y-6">
+                    <h1 className="text-2xl font-bold text-slate-800">
+                      Договор об оказании услуг для {currentContract.client_name}
+                    </h1>
+                    
+                    <div className="flex justify-center gap-4">
+                      <Button
+                        onClick={handleEditContent}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                      >
+                        Редактировать
+                      </Button>
+                      <Button
+                        onClick={downloadContract}
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+                      >
+                        Скачать Word
+                      </Button>
                     </div>
-                  ) : isEditing ? (
-                    <div className="space-y-4">
-                      <div>
-                        <Label className="text-slate-700 font-medium">
-                          Имя/название организации *
-                        </Label>
-                        <Input
-                          value={editForm.name_or_organization}
-                          onChange={(e) => setEditForm({...editForm, name_or_organization: e.target.value})}
-                          className="border-slate-200 focus:border-blue-500"
-                        />
-                      </div>
-
-                      <div>
-                        <Label className="text-slate-700 font-medium">
-                          Другие данные
-                        </Label>
-                        <Textarea
-                          value={editForm.other_details}
-                          onChange={(e) => setEditForm({...editForm, other_details: e.target.value})}
-                          className="border-slate-200 focus:border-blue-500 resize-none"
-                          rows={2}
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label className="text-slate-700 font-medium">
-                            Стоимость (рублей) *
-                          </Label>
-                          <Input
-                            type="number"
-                            value={editForm.service_cost}
-                            onChange={(e) => setEditForm({...editForm, service_cost: e.target.value})}
-                            className="border-slate-200 focus:border-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-slate-700 font-medium">
-                            Срок действия *
-                          </Label>
-                          <select
-                            value={editForm.duration_months}
-                            onChange={(e) => setEditForm({...editForm, duration_months: parseInt(e.target.value)})}
-                            className="w-full p-2 border border-slate-200 rounded-md focus:border-blue-500 focus:outline-none bg-white"
-                          >
-                            <option value={1}>1 месяц</option>
-                            <option value={6}>6 месяцев</option>
-                            <option value={12}>1 год</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={handleSaveEdit}
-                          disabled={loading}
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          {loading ? 'Сохранение...' : 'Сохранить'}
-                        </Button>
-                        <Button
-                          onClick={() => setIsEditing(false)}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          Отмена
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                          {currentContract.client_name}
-                        </h3>
-                        <p className="text-sm text-slate-600">
-                          № {currentContract.contract_number}
-                        </p>
-                      </div>
-
-                      <details className="mt-4">
-                        <summary className="cursor-pointer text-sm font-medium text-slate-700 hover:text-slate-900">
-                          Просмотр текста договора
-                        </summary>
-                        <div className="mt-2 max-h-96 overflow-y-auto">
-                          <pre className="whitespace-pre-wrap text-xs bg-slate-50 p-3 rounded-lg border">
-                            {currentContract.contract_content}
-                          </pre>
-                        </div>
-                      </details>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Initial state when no contract */}
-            {!currentContract && (
-              <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
-                <CardContent className="text-center py-12">
-                  <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-600 mb-2">
-                    Договор не создан
-                  </h3>
-                  <p className="text-slate-500">
-                    Заполните форму слева и нажмите "Создать договор"<br />
-                    для автоматической генерации договора
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                    
+                    <Button 
+                      onClick={resetContract}
+                      variant="outline"
+                      className="mt-4"
+                    >
+                      Создать новый договор
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
       <Toaster />
