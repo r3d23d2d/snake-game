@@ -752,7 +752,139 @@ async def create_contract_direct(contract_data: ContractData):
     return contract_obj
 
 # Contract endpoints
-@api_router.post("/contracts", response_model=Contract)
+@api_router.get("/contracts/direct", response_model=List[ContractNew])
+async def get_contracts_direct():
+    """Get all direct contracts"""
+    contracts = await db.contracts_new.find().to_list(1000)
+    return [ContractNew(**parse_from_mongo(contract)) for contract in contracts]
+
+@api_router.get("/contracts/direct/{contract_id}", response_model=ContractNew)
+async def get_contract_direct(contract_id: str):
+    """Get specific direct contract"""
+    contract = await db.contracts_new.find_one({"id": contract_id})
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    return ContractNew(**parse_from_mongo(contract))
+
+@api_router.put("/contracts/direct/{contract_id}", response_model=ContractNew)
+async def update_contract_direct(contract_id: str, contract_data: ContractData):
+    """Update direct contract with new data"""
+    existing_contract = await db.contracts_new.find_one({"id": contract_id})
+    if not existing_contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    # Keep original contract number and created_at
+    existing_parsed = ContractNew(**parse_from_mongo(existing_contract))
+    
+    # Convert service cost to words
+    service_cost_words = number_to_words_ru(contract_data.service_cost)
+    
+    # Calculate contract end date
+    end_date, end_month = calculate_contract_end_date(contract_data.duration_months)
+    
+    # Format client details for contract
+    client_details = contract_data.name_or_organization
+    if contract_data.other_details:
+        client_details += f"\n{contract_data.other_details}"
+    
+    # Use first field as client name in contract text
+    client_name_in_contract = contract_data.name_or_organization
+    
+    # Generate updated contract content
+    contract_content = CONTRACT_TEMPLATE.format(
+        contract_number=existing_parsed.contract_number,
+        client_name=client_name_in_contract,
+        service_cost=contract_data.service_cost,
+        service_cost_words=service_cost_words,
+        contract_end_date=end_date,
+        contract_end_month=end_month,
+        client_details=client_details,
+        client_signature=client_name_in_contract
+    )
+    
+    # Update contract
+    updated_data = {
+        "client_name": client_name_in_contract,
+        "client_details": client_details,
+        "service_cost": contract_data.service_cost,
+        "service_cost_words": service_cost_words,
+        "contract_end_date": end_date,
+        "contract_end_month": end_month,
+        "contract_content": contract_content,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.contracts_new.update_one(
+        {"id": contract_id}, 
+        {"$set": prepare_for_mongo(updated_data)}
+    )
+    
+    updated_contract = await db.contracts_new.find_one({"id": contract_id})
+    return ContractNew(**parse_from_mongo(updated_contract))
+
+@api_router.delete("/contracts/direct/{contract_id}")
+async def delete_contract_direct(contract_id: str):
+    """Delete direct contract"""
+    result = await db.contracts_new.delete_one({"id": contract_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    return {"message": "Contract deleted successfully"}
+
+@api_router.get("/contracts/direct/{contract_id}/download")
+async def download_contract_direct_word(contract_id: str):
+    """Download direct contract as Word document"""
+    # Get contract from database
+    contract = await db.contracts_new.find_one({"id": contract_id})
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    contract_obj = ContractNew(**parse_from_mongo(contract))
+    
+    # Prepare contract data for Word generation
+    contract_data = {
+        "contract_number": contract_obj.contract_number,
+        "client_name": contract_obj.client_name,
+        "service_cost": str(contract_obj.service_cost),
+        "service_cost_words": contract_obj.service_cost_words,
+        "contract_end_date": contract_obj.contract_end_date,
+        "contract_end_month": contract_obj.contract_end_month,
+        "client_details": contract_obj.client_details
+    }
+    
+    # Create Word document
+    doc = create_word_contract(contract_data)
+    
+    # Save to BytesIO
+    doc_buffer = io.BytesIO()
+    doc.save(doc_buffer)
+    doc_buffer.seek(0)
+    
+    # Create filename
+    safe_client_name = contract_obj.client_name.replace(' ', '_').replace('ё', 'e').replace('Ё', 'E')
+    # Simple transliteration for common Cyrillic characters
+    cyrillic_to_latin = {
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ж': 'zh', 'з': 'z',
+        'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
+        'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch',
+        'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+        'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ж': 'Zh', 'З': 'Z',
+        'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P',
+        'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch',
+        'Ш': 'Sh', 'Щ': 'Sch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+    }
+    
+    for cyrillic, latin in cyrillic_to_latin.items():
+        safe_client_name = safe_client_name.replace(cyrillic, latin)
+    
+    filename = f"Dogovor_{safe_client_name}_{contract_obj.contract_number.replace('.', '_')}.docx"
+    
+    return StreamingResponse(
+        io.BytesIO(doc_buffer.read()),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+# Contract endpoints
 async def create_contract(contract: ContractCreate):
     # Get client details
     client = await db.clients.find_one({"id": contract.client_id})
