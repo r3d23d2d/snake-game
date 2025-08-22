@@ -578,7 +578,7 @@ function App() {
                     <div className="space-y-4">
                       <div className="text-center">
                         <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                          Договор об оказании услуг для {currentContract.client_name}
+                          {currentContract.client_name}
                         </h3>
                         <p className="text-sm text-slate-600">
                           № {currentContract.contract_number}
