@@ -139,15 +139,15 @@ class ContractSystemTester:
             
             # Check if contract content contains client data
             contract_content = response.get('contract_content', '')
-            if 'Иванов Иван Иванович' in contract_content:
+            if 'ООО Новая Компания' in contract_content:
                 print("   ✅ Client name found in contract content")
             else:
                 print("   ❌ Client name NOT found in contract content")
                 
-            if 'ООО "Тестовая компания"' in contract_content:
-                print("   ✅ Organization found in contract content")
+            if 'Директор: Сидоров С.С.' in contract_content:
+                print("   ✅ Client details found in contract content")
             else:
-                print("   ❌ Organization NOT found in contract content")
+                print("   ❌ Client details NOT found in contract content")
                 
             if '30000' in contract_content and 'тридцать тысяч' in contract_content:
                 print("   ✅ Service cost found in contract content")
