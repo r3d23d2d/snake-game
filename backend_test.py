@@ -299,26 +299,113 @@ class ContractSystemTester:
             return True
         return False
 
-    def test_create_minimal_client(self):
-        """Test creating a client with minimal data (only name)"""
-        client_data = {
-            "name": "Тестовый Клиент Минимальный"
+    def test_create_petrov_client_and_contract(self):
+        """Test creating the specific client and contract from the review request"""
+        # Create Petrov client as specified in the review request
+        petrov_data = {
+            "name": "Петров Петр Петрович",
+            "organization": "ИП Петров",
+            "address": "СПб, ул. Невская, 10",
+            "inn": "9876543210",
+            "phone": "+7(812)555-55-55",
+            "email": "petrov@test.ru"
         }
         
         success, response = self.run_test(
-            "Create Minimal Client",
+            "Create Petrov Client (Review Request)",
             "POST",
             "clients",
             200,
-            data=client_data,
+            data=petrov_data,
             return_response=True
         )
         
-        if success and 'id' in response:
-            # Clean up immediately
-            requests.delete(f"{self.api_url}/clients/{response['id']}")
-            return True
-        return False
+        if not success or 'id' not in response:
+            return False
+            
+        petrov_client_id = response['id']
+        print(f"   Created Petrov client ID: {petrov_client_id}")
+        
+        # Create contract for Petrov as specified
+        petrov_contract_data = {
+            "client_id": petrov_client_id,
+            "service_cost": "50000",
+            "service_cost_words": "пятьдесят тысяч",
+            "contract_end_date": "25",
+            "contract_end_month": "ноября"
+        }
+        
+        success, response = self.run_test(
+            "Create Petrov Contract (Review Request)",
+            "POST",
+            "contracts",
+            200,
+            data=petrov_contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            # Clean up client
+            requests.delete(f"{self.api_url}/clients/{petrov_client_id}")
+            return False
+            
+        petrov_contract_id = response['id']
+        print(f"   Created Petrov contract ID: {petrov_contract_id}")
+        
+        # Test download for Petrov contract
+        url = f"{self.api_url}/contracts/{petrov_contract_id}/download"
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Download Petrov Contract Word...")
+        print(f"   URL: {url}")
+        
+        try:
+            download_response = requests.get(url)
+            
+            success = download_response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {download_response.status_code}")
+                
+                # Check filename contains Petrov
+                content_disposition = download_response.headers.get('Content-Disposition', '')
+                if 'Петров_Петр_Петрович' in content_disposition or 'Petrov' in content_disposition:
+                    print("   ✅ Filename contains Petrov client name")
+                else:
+                    print(f"   ❌ Filename doesn't contain Petrov: {content_disposition}")
+                
+                # Verify contract content has all Petrov data
+                contract_content = response.get('contract_content', '')
+                checks = [
+                    ('Client name', 'Петров Петр Петрович' in contract_content),
+                    ('Organization', 'ИП Петров' in contract_content),
+                    ('Address', 'СПб, ул. Невская, 10' in contract_content),
+                    ('INN', '9876543210' in contract_content),
+                    ('Phone', '+7(812)555-55-55' in contract_content),
+                    ('Email', 'petrov@test.ru' in contract_content),
+                    ('Cost', '50000' in contract_content),
+                    ('Cost words', 'пятьдесят тысяч' in contract_content),
+                    ('End date', '25' in contract_content and 'ноября' in contract_content)
+                ]
+                
+                for check_name, check_result in checks:
+                    if check_result:
+                        print(f"   ✅ {check_name} found in contract")
+                    else:
+                        print(f"   ❌ {check_name} NOT found in contract")
+                
+            else:
+                print(f"❌ Download failed - Expected 200, got {download_response.status_code}")
+                
+        except Exception as e:
+            print(f"❌ Download failed - Error: {str(e)}")
+            success = False
+        
+        # Clean up
+        requests.delete(f"{self.api_url}/contracts/{petrov_contract_id}")
+        requests.delete(f"{self.api_url}/clients/{petrov_client_id}")
+        
+        return success
 
 def main():
     print("🚀 Starting Contract Management System Backend Tests")
