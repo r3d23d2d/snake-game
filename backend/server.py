@@ -963,6 +963,7 @@ async def download_contract_word(contract_id: str):
         "service_cost_words": contract_obj.service_cost_words,
         "contract_end_date": contract_obj.contract_end_date,
         "contract_end_month": contract_obj.contract_end_month,
+        "contract_end_year": "2025",  # Default year for legacy contracts
         "client_details": client_details
     }
     
