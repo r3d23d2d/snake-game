@@ -74,10 +74,10 @@ function App() {
 
   const handleClientSubmit = async (e) => {
     e.preventDefault();
-    if (!clientForm.name.trim()) {
+    if (!clientForm.name_or_organization.trim()) {
       toast({
         title: "Ошибка",
-        description: "Имя клиента обязательно для заполнения",
+        description: "Имя/название организации обязательно для заполнения",
         variant: "destructive",
       });
       return;
@@ -91,12 +91,8 @@ function App() {
         description: "Клиент добавлен",
       });
       setClientForm({
-        name: '',
-        organization: '',
-        address: '',
-        inn: '',
-        phone: '',
-        email: ''
+        name_or_organization: '',
+        other_details: ''
       });
       fetchClients();
     } catch (error) {
