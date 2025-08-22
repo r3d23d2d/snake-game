@@ -520,18 +520,13 @@ async def create_contract(contract: ContractCreate):
     
     client_obj = Client(**parse_from_mongo(client))
     
-    # Format client details for contract
-    client_details = f"{client_obj.name}"
-    if client_obj.organization:
-        client_details = f"{client_obj.organization}\n{client_obj.name}"
-    if client_obj.address:
-        client_details += f"\n{client_obj.address}"
-    if client_obj.inn:
-        client_details += f"\nИНН {client_obj.inn}"
-    if client_obj.phone:
-        client_details += f"\nТел.: {client_obj.phone}"
-    if client_obj.email:
-        client_details += f"\nEmail: {client_obj.email}"
+    # Format client details for contract - use the new structure
+    client_details = client_obj.name_or_organization
+    if client_obj.other_details:
+        client_details += f"\n{client_obj.other_details}"
+    
+    # For client name in contract text, use the first field
+    client_name_in_contract = client_obj.name_or_organization
     
     # Generate contract content
     contract_content = CONTRACT_TEMPLATE.format(
