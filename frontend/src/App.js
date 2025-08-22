@@ -429,23 +429,34 @@ function App() {
                       </CardDescription>
                     </div>
                     <div className="flex gap-2">
-                      {!isEditing && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleEditContract}
-                          className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                          title="Редактировать"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
+                      {!isEditing && !isEditingContent && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleEditContract}
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                            title="Редактировать параметры"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleEditContent}
+                            className="text-purple-600 border-purple-200 hover:bg-purple-50"
+                            title="Редактировать текст договора"
+                          >
+                            <FileEdit className="w-4 h-4" />
+                          </Button>
+                        </>
                       )}
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={downloadContract}
+                        onClick={isEditingContent ? downloadCustomContract : downloadContract}
                         className="text-green-600 border-green-200 hover:bg-green-50"
-                        title="Скачать Word"
+                        title={isEditingContent ? "Скачать редактированный договор" : "Скачать Word"}
                       >
                         <Download className="w-4 h-4" />
                       </Button>
