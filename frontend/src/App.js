@@ -127,7 +127,6 @@ function App() {
       
       setCurrentContract(response.data);
       setIsEditingContent(false);
-      setHasUnsavedChanges(false); // Сброс флага после сохранения
     } catch (error) {
       console.error('Error updating contract content:', error);
       toast({
