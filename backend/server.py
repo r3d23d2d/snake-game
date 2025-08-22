@@ -771,6 +771,7 @@ async def update_contract_direct(contract_id: str, contract_data: ContractData):
         service_cost_words=service_cost_words,
         contract_end_date=end_date,
         contract_end_month=end_month,
+        contract_end_year=end_year,
         client_details=client_details,
         client_signature=client_name_in_contract
     )
