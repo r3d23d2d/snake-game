@@ -681,7 +681,7 @@ async def create_contract_direct(contract_data: ContractData):
     service_cost_words = number_to_words_ru(contract_data.service_cost)
     
     # Calculate contract end date
-    end_date, end_month = calculate_contract_end_date(contract_data.duration_months)
+    end_date, end_month, end_year = calculate_contract_end_date(contract_data.duration_months)
     
     # Format client details for contract
     client_details = contract_data.name_or_organization
