@@ -213,11 +213,11 @@ backend:
 
   - task: "Fix contract end date calculation to include year"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -225,14 +225,17 @@ backend:
         - working: false
           agent: "main"
           comment: "Fixed calculate_contract_end_date function to return year, updated ContractNew model to include contract_end_year field, and updated all related API endpoints to use dynamic year instead of hardcoded 2025"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Contract end date year calculation working correctly. Tested with 1, 6, and 12 month durations. For 6 months from August 2025, correctly calculates end date as February 2026. ContractNew model includes contract_end_year field and all API endpoints return correct year. Fixed backward compatibility issue by making contract_end_year optional with default value."
 
   - task: "Add Kazan and contract signing date to Word document header"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -240,14 +243,17 @@ backend:
         - working: false
           agent: "main"
           comment: "Added header with 'Казань' on left and current date with Russian month names on right, removed old centered date format"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Word document header improvements working correctly. 'Казань' appears on the left side of document header. Current date with Russian month names appears on the right side. Header formatting is properly aligned and uses correct Russian date format."
 
   - task: "Move section 11 to new page and compact executor details"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -255,6 +261,9 @@ backend:
         - working: false
           agent: "main"
           comment: "Added page break before section 11, compacted executor details from 16 lines to 6 lines, maintained all essential information"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Section 11 formatting improvements working correctly. Section 11 'ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' now starts on a new page with proper page break. Executor details are compacted but still include all essential information (ИП details, address, INN, OGRNIP, bank details). Document structure and formatting maintained."
 
 frontend:
   - task: "Create single page layout instead of tabs"
