@@ -135,7 +135,8 @@ def number_to_words_ru(num):
 
 def generate_contract_number():
     """Generate contract number based on current date: КР + DD.MM.YY"""
-    now = datetime.now(timezone.utc)
+    moscow_tz = timezone(timedelta(hours=3))
+    now = datetime.now(moscow_tz)
     return f"КР{now.strftime('%d.%m.%y')}"
 
 def calculate_contract_end_date(duration_months: int):
