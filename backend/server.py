@@ -535,12 +535,22 @@ def create_word_contract(contract_data):
     exec_run.font.size = Pt(11)
     
     executor_details = [
-        "ИП Шамсутдинов Радис Раисович",
-        "423040, РТ, Нурлатский р-н, г. Нурлат,",
+        "Индивидуальный предприниматель",
+        "Шамсутдинов Радис Раисович",  
+        "Юридический адрес организации",
+        "423040, Россия, Республика Татарстан,",
+        "Нурлатский р-н, г. Нурлат,",
         "ул. им Р.С. Хамадеева, д. 9, кв. 8",
-        "ИНН 163205154150, ОГРНИП 319169000185092",
-        "Р/с 40802810700001303517, АО «ТБанк»",
-        "К/с 30101810145250000974, БИК 044525974"
+        "ИНН 163205154150",
+        "ОГРНИП 319169000185092",
+        "Р/с 40802810700001303517",
+        "Банк АО «ТБанк»",
+        "Юридический адрес банка",
+        "127287, г. Москва, ул. Хуторская 2-я,",
+        "д.38А, стр. 26",
+        "К/с 30101810145250000974",
+        "ИНН банка 7710140679",
+        "БИК 044525974"
     ]
     
     for detail in executor_details:
@@ -548,6 +558,9 @@ def create_word_contract(contract_data):
         exec_detail_run = exec_detail_para.add_run(detail)
         exec_detail_run.font.name = 'Times New Roman'
         exec_detail_run.font.size = Pt(11)
+        # Make paragraph spacing more compact
+        exec_detail_para.space_after = Pt(0)
+        exec_detail_para.space_before = Pt(0)
     
     # Add signature line for executor
     exec_sig_para = executor_cell.add_paragraph()
