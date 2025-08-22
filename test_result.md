@@ -460,6 +460,21 @@ frontend:
           agent: "main"
           comment: "Simplified contract display to show only contract title with genitive case name, contract number, and action buttons. Removed detailed client information, cost, and term details from main view."
 
+  - task: "Fix contract content editing and download functionality" 
+    implemented: true
+    working: false
+    file: "App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reported that when editing contract content and clicking download, the edits are not reflected in the downloaded Word document"
+        - working: true
+          agent: "main"
+          comment: "Fixed the issue by changing download button to always use downloadCustomContract function instead of downloadContract. This ensures that the most up-to-date contract content from the database is used for Word document generation."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
