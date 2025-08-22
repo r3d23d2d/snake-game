@@ -128,6 +128,38 @@ def generate_contract_number():
     now = datetime.now(timezone.utc)
     return f"КР{now.strftime('%d.%m.%y')}"
 
+def calculate_contract_end_date(duration_months: int):
+    """Calculate contract end date based on duration"""
+    now = datetime.now(timezone.utc)
+    
+    # Calculate end month
+    end_month = now.month + duration_months
+    end_year = now.year
+    
+    if end_month > 12:
+        end_year = end_year + (end_month - 1) // 12
+        end_month = ((end_month - 1) % 12) + 1
+    
+    # Get the last day of the end month
+    if end_month == 12:
+        next_month = 1
+        next_year = end_year + 1
+    else:
+        next_month = end_month + 1
+        next_year = end_year
+    
+    last_day_of_month = (datetime(next_year, next_month, 1) - timedelta(days=1)).day
+    
+    end_date = datetime(end_year, end_month, last_day_of_month)
+    
+    # Format for template
+    months_ru = {
+        1: "января", 2: "февраля", 3: "марта", 4: "апреля", 5: "мая", 6: "июня",
+        7: "июля", 8: "августа", 9: "сентября", 10: "октября", 11: "ноября", 12: "декабря"
+    }
+    
+    return str(end_date.day), months_ru[end_date.month]
+
 # Contract template - the default contract
 CONTRACT_TEMPLATE = """**Договор об оказании услуг № КР____**
 
