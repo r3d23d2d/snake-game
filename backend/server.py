@@ -583,6 +583,62 @@ async def delete_contract(contract_id: str):
         raise HTTPException(status_code=404, detail="Contract not found")
     return {"message": "Contract deleted successfully"}
 
+@api_router.get("/contracts/{contract_id}/download")
+async def download_contract_word(contract_id: str):
+    # Get contract from database
+    contract = await db.contracts.find_one({"id": contract_id})
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    contract_obj = Contract(**parse_from_mongo(contract))
+    
+    # Get client details for formatting
+    client = await db.clients.find_one({"id": contract_obj.client_id})
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    client_obj = Client(**parse_from_mongo(client))
+    
+    # Format client details
+    client_details = f"{client_obj.name}"
+    if client_obj.organization:
+        client_details = f"{client_obj.organization}\n{client_obj.name}"
+    if client_obj.address:
+        client_details += f"\n{client_obj.address}"
+    if client_obj.inn:
+        client_details += f"\nИНН {client_obj.inn}"
+    if client_obj.phone:
+        client_details += f"\nТел.: {client_obj.phone}"
+    if client_obj.email:
+        client_details += f"\nEmail: {client_obj.email}"
+    
+    # Prepare contract data for Word generation
+    contract_data = {
+        "client_name": contract_obj.client_name,
+        "service_cost": contract_obj.service_cost,
+        "service_cost_words": contract_obj.service_cost_words,
+        "contract_end_date": contract_obj.contract_end_date,
+        "contract_end_month": contract_obj.contract_end_month,
+        "client_details": client_details
+    }
+    
+    # Create Word document
+    doc = create_word_contract(contract_data)
+    
+    # Save to BytesIO
+    doc_buffer = io.BytesIO()
+    doc.save(doc_buffer)
+    doc_buffer.seek(0)
+    
+    # Create filename
+    filename = f"Договор_{contract_obj.client_name.replace(' ', '_')}_{contract_obj.id[:8]}.docx"
+    
+    return StreamingResponse(
+        io.BytesIO(doc_buffer.read()),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # Include the router in the main app
 app.include_router(api_router)
 
