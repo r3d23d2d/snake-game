@@ -258,82 +258,31 @@ function App() {
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleClientSubmit} className="space-y-4">
-                      <div className="grid grid-cols-1 gap-4">
+                      <div className="space-y-4">
                         <div>
-                          <Label htmlFor="name" className="text-slate-700 font-medium">
-                            Имя клиента *
+                          <Label htmlFor="name_or_organization" className="text-slate-700 font-medium">
+                            Имя/название организации *
                           </Label>
                           <Input
-                            id="name"
-                            value={clientForm.name}
-                            onChange={(e) => setClientForm({...clientForm, name: e.target.value})}
-                            placeholder="ФИО клиента"
+                            id="name_or_organization"
+                            value={clientForm.name_or_organization}
+                            onChange={(e) => setClientForm({...clientForm, name_or_organization: e.target.value})}
+                            placeholder="ООО Компания или Иванов Иван Иванович"
                             className="border-slate-200 focus:border-blue-500"
                             required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="organization" className="text-slate-700 font-medium">
-                            Организация
-                          </Label>
-                          <Input
-                            id="organization"
-                            value={clientForm.organization}
-                            onChange={(e) => setClientForm({...clientForm, organization: e.target.value})}
-                            placeholder="Название организации"
-                            className="border-slate-200 focus:border-blue-500"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="address" className="text-slate-700 font-medium">
-                            Адрес
+                          <Label htmlFor="other_details" className="text-slate-700 font-medium">
+                            Другие данные
                           </Label>
                           <Textarea
-                            id="address"
-                            value={clientForm.address}
-                            onChange={(e) => setClientForm({...clientForm, address: e.target.value})}
-                            placeholder="Юридический адрес"
+                            id="other_details"
+                            value={clientForm.other_details}
+                            onChange={(e) => setClientForm({...clientForm, other_details: e.target.value})}
+                            placeholder="Адрес, ИНН, телефон, email и другая информация о клиенте..."
                             className="border-slate-200 focus:border-blue-500 resize-none"
-                            rows={2}
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="inn" className="text-slate-700 font-medium">
-                              ИНН
-                            </Label>
-                            <Input
-                              id="inn"
-                              value={clientForm.inn}
-                              onChange={(e) => setClientForm({...clientForm, inn: e.target.value})}
-                              placeholder="ИНН"
-                              className="border-slate-200 focus:border-blue-500"
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="phone" className="text-slate-700 font-medium">
-                              Телефон
-                            </Label>
-                            <Input
-                              id="phone"
-                              value={clientForm.phone}
-                              onChange={(e) => setClientForm({...clientForm, phone: e.target.value})}
-                              placeholder="+7 (XXX) XXX-XX-XX"
-                              className="border-slate-200 focus:border-blue-500"
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <Label htmlFor="email" className="text-slate-700 font-medium">
-                            Email
-                          </Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={clientForm.email}
-                            onChange={(e) => setClientForm({...clientForm, email: e.target.value})}
-                            placeholder="email@example.com"
-                            className="border-slate-200 focus:border-blue-500"
+                            rows={4}
                           />
                         </div>
                       </div>
