@@ -174,57 +174,6 @@ function App() {
     }
   };
 
-  const handleSaveEdit = async () => {
-    if (!editForm.name_or_organization.trim()) {
-      toast({
-        title: "Ошибка",
-        description: "Имя/название организации обязательно для заполнения",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!editForm.service_cost || isNaN(parseInt(editForm.service_cost))) {
-      toast({
-        title: "Ошибка",
-        description: "Введите корректную стоимость услуг", 
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const contractData = {
-        ...editForm,
-        service_cost: parseInt(editForm.service_cost)
-      };
-
-      const response = await axios.put(`${API}/contracts/direct/${currentContract.id}`, contractData);
-      
-      toast({
-        title: "Успешно",
-        description: "Договор обновлен",
-      });
-      
-      setCurrentContract(response.data);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating contract:', error);
-      toast({
-        title: "Ошибка", 
-        description: "Не удалось обновить договор",
-        variant: "destructive",
-      });
-    }
-    setLoading(false);
-  };
-
-  const calculateDurationFromDates = (startDate, endDate) => {
-    // Simple calculation - return 6 as default
-    return 6;
-  };
-
   const downloadContract = async () => {
     if (!currentContract) return;
     
