@@ -903,6 +903,7 @@ async def download_contract_direct_word(contract_id: str):
     )
 
 # Contract endpoints
+@api_router.post("/contracts", response_model=Contract)
 async def create_contract(contract: ContractCreate):
     # Get client details
     client = await db.clients.find_one({"id": contract.client_id})
