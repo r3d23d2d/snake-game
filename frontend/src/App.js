@@ -286,6 +286,8 @@ function App() {
   const resetContract = () => {
     setCurrentContract(null);
     setIsEditing(false);
+    setIsEditingContent(false);
+    setEditedContent('');
     setContractForm({
       name_or_organization: '',
       other_details: '',
