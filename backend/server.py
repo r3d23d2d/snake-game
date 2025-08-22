@@ -439,12 +439,7 @@ def create_word_contract(contract_data):
     # Title (first element, larger font)
     title_para = doc.add_paragraph()
     title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    
-    # Get client name in genitive case for title
-    client_genitive = to_genitive_case(contract_data['client_name'])
-    title_text = f"Договор об оказании услуг для {client_genitive} № {contract_data['contract_number']}"
-    
-    title_run = title_para.add_run(title_text)
+    title_run = title_para.add_run(f"Договор об оказании услуг № {contract_data['contract_number']}")
     title_run.bold = True
     title_run.font.name = 'Times New Roman'
     title_run.font.size = Pt(14)  # Larger font size
