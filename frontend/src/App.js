@@ -314,15 +314,10 @@ function App() {
                         <div key={client.id} className="p-4 border border-slate-200 rounded-lg bg-white/50 hover:bg-white/70 transition-colors">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
-                              <h3 className="font-semibold text-slate-800">{client.name}</h3>
-                              {client.organization && (
-                                <p className="text-sm text-slate-600">{client.organization}</p>
+                              <h3 className="font-semibold text-slate-800">{client.name_or_organization}</h3>
+                              {client.other_details && (
+                                <p className="text-sm text-slate-600 mt-1 whitespace-pre-wrap">{client.other_details}</p>
                               )}
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {client.inn && <Badge variant="outline">ИНН: {client.inn}</Badge>}
-                                {client.phone && <Badge variant="outline">{client.phone}</Badge>}
-                                {client.email && <Badge variant="outline">{client.email}</Badge>}
-                              </div>
                             </div>
                             <Button
                               variant="ghost"
