@@ -697,6 +697,60 @@ async def delete_client(client_id: str):
         raise HTTPException(status_code=404, detail="Client not found")
     return {"message": "Client deleted successfully"}
 
+# New direct contract creation endpoint  
+@api_router.post("/contracts/direct", response_model=ContractNew)
+async def create_contract_direct(contract_data: ContractData):
+    """Create contract directly without separate client record"""
+    
+    # Generate contract number
+    contract_number = generate_contract_number()
+    
+    # Convert service cost to words
+    service_cost_words = number_to_words_ru(contract_data.service_cost)
+    
+    # Calculate contract end date
+    end_date, end_month = calculate_contract_end_date(contract_data.duration_months)
+    
+    # Format client details for contract
+    client_details = contract_data.name_or_organization
+    if contract_data.other_details:
+        client_details += f"\n{contract_data.other_details}"
+    
+    # Use first field as client name in contract text
+    client_name_in_contract = contract_data.name_or_organization
+    
+    # Generate contract content
+    contract_content = CONTRACT_TEMPLATE.format(
+        contract_number=contract_number,
+        client_name=client_name_in_contract,
+        service_cost=contract_data.service_cost,
+        service_cost_words=service_cost_words,
+        contract_end_date=end_date,
+        contract_end_month=end_month,
+        client_details=client_details,
+        client_signature=client_name_in_contract
+    )
+    
+    # Create contract object
+    now = datetime.now(timezone.utc)
+    contract_obj = ContractNew(
+        contract_number=contract_number,
+        client_name=client_name_in_contract,
+        client_details=client_details,
+        service_cost=contract_data.service_cost,
+        service_cost_words=service_cost_words,
+        contract_start_date=now.strftime('%d.%m.%Y'),
+        contract_end_date=end_date,
+        contract_end_month=end_month,
+        contract_content=contract_content
+    )
+    
+    # Save to database
+    contract_data_dict = prepare_for_mongo(contract_obj.dict())
+    await db.contracts_new.insert_one(contract_data_dict)
+    
+    return contract_obj
+
 # Contract endpoints
 @api_router.post("/contracts", response_model=Contract)
 async def create_contract(contract: ContractCreate):
