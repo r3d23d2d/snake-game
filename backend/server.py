@@ -430,7 +430,7 @@ def create_word_contract(contract_data):
     
     # Section 2 - Term
     add_formatted_paragraph(doc, "2. СРОК ДЕЙСТВИЯ ДОГОВОРА", bold=True, alignment=WD_ALIGN_PARAGRAPH.CENTER)
-    add_formatted_paragraph(doc, f'2.1. Настоящий Договор вступает в силу с даты его подписания Сторонами и действует до «{contract_data["contract_end_date"]}» {contract_data["contract_end_month"]} 2025 года.', alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
+    add_formatted_paragraph(doc, f'2.1. Настоящий Договор вступает в силу с даты его подписания Сторонами и действует до «{contract_data["contract_end_date"]}» {contract_data["contract_end_month"]} {contract_data["contract_end_year"]} года.', alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
     add_formatted_paragraph(doc, '2.2. Договор может быть расторгнут в одностороннем порядке по инициативе одной из Сторон при условии письменного уведомления другой Стороны, но не позднее чем за 7 (семь) дней до предполагаемой даты расторжения Договора.', alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
     add_formatted_paragraph(doc, '2.3. Досрочное расторжение Договора возможно по взаимному согласию Сторон, выраженному в письменной форме.', alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
     add_formatted_paragraph(doc, '2.4. Если иное не предусмотрено в соглашении сторон о досрочном расторжении договора, прекращение действия Договора не освобождает Стороны от необходимости исполнения всех своих обязательств, предусмотренных Договором, которые не были исполнены на момент прекращения его действия, а также не освобождает Стороны от ответственности за неисполнение (ненадлежащее исполнение) обязательств.', alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
