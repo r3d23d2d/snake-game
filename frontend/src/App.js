@@ -470,7 +470,7 @@ function App() {
                         <div>
                           <p className="text-sm text-slate-600">Срок действия:</p>
                           <p className="font-semibold">
-                            До {currentContract.contract_end_date} {currentContract.contract_end_month} 2025
+                            До {currentContract.contract_end_date} {currentContract.contract_end_month} {currentContract.contract_end_year || '2025'}
                           </p>
                         </div>
                       </div>
