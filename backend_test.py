@@ -1591,6 +1591,9 @@ def main():
         ("Contract Updates", direct_tester.test_contract_updates),
         ("Word Document Improvements", direct_tester.test_word_document_improvements),
         ("Word Download", direct_tester.test_word_download),
+        ("Contract Content Editing", direct_tester.test_contract_content_editing),
+        ("Custom Contract Download", direct_tester.test_custom_contract_download),
+        ("Contract Content Validation", direct_tester.test_contract_content_validation),
     ]
     
     # Run direct contract tests
