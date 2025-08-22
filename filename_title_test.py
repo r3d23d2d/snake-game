@@ -10,7 +10,7 @@ from urllib.parse import unquote
 class FilenameAndTitleTester:
     """Test filename and title fixes for contract documents as requested in review"""
     
-    def __init__(self, base_url="https://contractify.preview.emergentagent.com"):
+    def __init__(self, base_url="https://contract-forge.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
