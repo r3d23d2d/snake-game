@@ -229,7 +229,7 @@ class ContractSystemTester:
                     print(f"   📄 Filename: {filename_part}")
                     
                     # Check if filename contains client name and .docx extension
-                    if 'Ivanov_Ivan_Ivanovich' in filename_part and '.docx' in filename_part:
+                    if 'OOO_Novaya_Kompaniya' in filename_part and '.docx' in filename_part:
                         print("   ✅ Filename contains transliterated client name and .docx extension")
                     else:
                         print("   ❌ Filename format incorrect")
