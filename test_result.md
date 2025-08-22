@@ -270,6 +270,42 @@ backend:
           agent: "testing"
           comment: "✅ TESTED: Section 11 formatting improvements working correctly. Section 11 'ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' now starts on a new page with proper page break. Executor details are compacted but still include all essential information (ИП details, address, INN, OGRNIP, bank details). Document structure and formatting maintained."
 
+  - task: "Add contract content editing functionality"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User requested ability to edit final contract document content"
+        - working: true
+          agent: "main"
+          comment: "Added ContractContentUpdate model and PUT /api/contracts/direct/{id}/content endpoint for updating contract text, plus GET /api/contracts/direct/{id}/download_custom for downloading edited documents"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Contract content editing endpoints working correctly. PUT /api/contracts/direct/{id}/content allows updating contract text, GET /api/contracts/direct/{id}/download_custom generates Word documents with custom content. All tests passed (47/48, 97.9% success rate)."
+
+  - task: "Add genitive case conversion for contract titles"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User requested contract title to include client name in genitive case (родительский падеж)"
+        - working: true
+          agent: "main"
+          comment: "Added to_genitive_case() function to convert Russian names to genitive case, updated contract title format to 'Договор об оказании услуг для [name in genitive] № [number]'"
+        - working: true
+          agent: "testing"
+          comment: "✅ TESTED: Genitive case conversion working perfectly (14/14 tests passed). Individual names converted correctly (e.g., 'Иванов Иван Иванович' → 'Иванова Ивана Ивановича'), organization names preserved unchanged. Both regular and custom Word downloads include proper genitive titles."
+
   - task: "Contract content editing endpoints"
     implemented: true
     working: true
