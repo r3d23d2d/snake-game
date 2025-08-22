@@ -407,6 +407,27 @@ class ContractSystemTester:
         
         return success
 
+    def test_create_minimal_client(self):
+        """Test creating a client with minimal data (only name)"""
+        client_data = {
+            "name": "Тестовый Клиент Минимальный"
+        }
+        
+        success, response = self.run_test(
+            "Create Minimal Client",
+            "POST",
+            "clients",
+            200,
+            data=client_data,
+            return_response=True
+        )
+        
+        if success and 'id' in response:
+            # Clean up immediately
+            requests.delete(f"{self.api_url}/clients/{response['id']}")
+            return True
+        return False
+
 def main():
     print("🚀 Starting Contract Management System Backend Tests")
     print("=" * 60)
