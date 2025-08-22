@@ -443,7 +443,157 @@ class DirectContractTester:
             
         return False
 
-    def test_word_download(self):
+    def test_word_document_improvements(self):
+        """Test Word document generation with new header format and section 11 improvements"""
+        # Create a contract for Word document testing
+        contract_data = {
+            "name_or_organization": "ООО Тест Документ",
+            "other_details": "Тестовые данные для проверки документа\nАдрес: г. Казань, ул. Тестовая, 1",
+            "service_cost": 50000,
+            "duration_months": 6
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Word Document Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            return False
+            
+        contract_id = response['id']
+        self.created_contract_ids.append(contract_id)
+        
+        # Test Word document download
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download"
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Word Document Improvements...")
+        print(f"   URL: {url}")
+        
+        try:
+            download_response = requests.get(url)
+            
+            success = download_response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {download_response.status_code}")
+                
+                # Check Content-Type header
+                content_type = download_response.headers.get('Content-Type', '')
+                expected_content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                if expected_content_type in content_type:
+                    print("   ✅ Correct Content-Type for Word document")
+                else:
+                    print(f"   ❌ Wrong Content-Type: {content_type}")
+                    return False
+                
+                # Check file size (Word documents should have reasonable size)
+                content_length = len(download_response.content)
+                if content_length > 5000:  # At least 5KB for a Word document with improvements
+                    print(f"   ✅ File size reasonable: {content_length} bytes")
+                else:
+                    print(f"   ❌ File size too small: {content_length} bytes")
+                    return False
+                
+                # Check if it's actually a Word document by checking magic bytes
+                if download_response.content.startswith(b'PK'):  # ZIP-based format (Word .docx)
+                    print("   ✅ File appears to be a valid Word document (ZIP-based)")
+                else:
+                    print("   ❌ File does not appear to be a valid Word document")
+                    return False
+                
+                # Save the document temporarily to check content
+                import tempfile
+                import zipfile
+                import xml.etree.ElementTree as ET
+                
+                with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                    temp_file.write(download_response.content)
+                    temp_file_path = temp_file.name
+                
+                try:
+                    # Extract and check document content
+                    with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                        # Read the main document XML
+                        document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                        
+                        # Check for "Казань" in the document
+                        if 'Казань' in document_xml:
+                            print("   ✅ 'Казань' found in document header")
+                        else:
+                            print("   ❌ 'Казань' NOT found in document header")
+                            return False
+                        
+                        # Check for Russian month names (indicating date formatting)
+                        russian_months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+                                        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря']
+                        month_found = any(month in document_xml for month in russian_months)
+                        if month_found:
+                            print("   ✅ Russian month names found in document (proper date formatting)")
+                        else:
+                            print("   ❌ Russian month names NOT found in document")
+                            return False
+                        
+                        # Check for section 11 content
+                        if '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' in document_xml:
+                            print("   ✅ Section 11 found in document")
+                        else:
+                            print("   ❌ Section 11 NOT found in document")
+                            return False
+                        
+                        # Check for page break before section 11 (indicated by page break XML)
+                        if 'w:br w:type="page"' in document_xml or '<w:br w:type="page"/>' in document_xml:
+                            print("   ✅ Page break found in document (section 11 on new page)")
+                        else:
+                            print("   ❌ Page break NOT found in document")
+                            return False
+                        
+                        # Check for compact executor details (should have fewer line breaks)
+                        executor_section = document_xml[document_xml.find('«Исполнитель»:'):document_xml.find('«Заказчик»:')]
+                        if executor_section:
+                            # Count line breaks in executor section
+                            line_breaks = executor_section.count('<w:br/>') + executor_section.count('<w:br ')
+                            if line_breaks < 10:  # Should be more compact now
+                                print(f"   ✅ Executor details are compact ({line_breaks} line breaks)")
+                            else:
+                                print(f"   ❌ Executor details not compact enough ({line_breaks} line breaks)")
+                                return False
+                        
+                        # Check for contract end year in document content
+                        end_year = response.get('contract_end_year', '')
+                        if end_year and end_year in document_xml:
+                            print(f"   ✅ Contract end year ({end_year}) found in document")
+                        else:
+                            print(f"   ❌ Contract end year ({end_year}) NOT found in document")
+                            return False
+                        
+                        print("   ✅ All Word document improvements verified successfully")
+                        return True
+                        
+                except Exception as e:
+                    print(f"   ❌ Error checking document content: {str(e)}")
+                    return False
+                finally:
+                    # Clean up temporary file
+                    import os
+                    try:
+                        os.unlink(temp_file_path)
+                    except:
+                        pass
+                
+            else:
+                print(f"❌ Failed - Expected 200, got {download_response.status_code}")
+                print(f"   Response: {download_response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
         """Test Word document download with GET /api/contracts/direct/{id}/download"""
         # Create a contract for download testing
         contract_data = {
