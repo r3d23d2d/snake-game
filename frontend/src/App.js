@@ -464,7 +464,43 @@ function App() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {isEditing ? (
+                  {isEditingContent ? (
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="text-slate-700 font-medium mb-2 block">
+                          Редактирование текста договора
+                        </Label>
+                        <Textarea
+                          value={editedContent}
+                          onChange={(e) => setEditedContent(e.target.value)}
+                          className="border-slate-200 focus:border-purple-500 resize-none min-h-[400px] font-mono text-sm"
+                          placeholder="Введите текст договора..."
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          Отредактируйте текст договора. Изменения будут сохранены и применены к Word документу.
+                        </p>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleSaveContent}
+                          disabled={loading}
+                          className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          {loading ? 'Сохранение...' : 'Сохранить изменения'}
+                        </Button>
+                        <Button
+                          onClick={() => setIsEditingContent(false)}
+                          variant="outline"
+                          className="flex-1"
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Отмена
+                        </Button>
+                      </div>
+                    </div>
+                  ) : isEditing ? (
                     <div className="space-y-4">
                       <div>
                         <Label className="text-slate-700 font-medium">
