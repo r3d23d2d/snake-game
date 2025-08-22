@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,9 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import uuid
-from datetime import datetime
-
+from datetime import datetime, timezone
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,32 +24,301 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Contract template - the default contract
+CONTRACT_TEMPLATE = """**Договор об оказании услуг № КР____**
 
-# Define Models
-class StatusCheck(BaseModel):
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {client_name}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. «Исполнитель» принимает на себя обязательства оказать комплекс услуг в соответствии с заявками «Заказчика», а «Заказчик» обязуется принять услуги и оплатить их в размере и порядке, установленном настоящим договором.
+
+1.2. В комплекс оказываемых услуг входят:
+
+1.2.1. Создание рекламных кампаний в Яндекс.Директ.
+
+Создание кампании контекстной рекламы включает в себя:
+
+- Анализ поискового спроса по тематике деятельности, указанной Заказчиком;
+- Подбор ключевых запросов, по которым будут размещаться рекламные объявления заказчика;
+- Подготовка ключевых запросов к публикации в контекстной системе;
+- Составление текстовых блоков объявлений, на основе информационных материалов, предоставленных заказчиком;
+- Публикация ключевых запросов, текстовых блоков и веб-страниц в аккаунтах контекстных систем сети Интернет. Запуск рекламных кампаний;
+
+1.2.2. В подарок «Исполнитель» осуществляет ведение рекламных кампаний в течение 3 (трёх) календарных недель после запуска. Ведение рекламной кампании по контекстной рекламе:
+
+- Управление ценой клика кампаний;
+- Мониторинг изменений позиций объявлений;
+- Мониторинг эффективности текстовых блоков объявлений;
+- Мониторинг статуса ключевых запросов;
+- Мониторинг CTR кампаний;
+
+1.3. Настройка и ведение рекламных кампаний осуществляются через аккаунты, созданные в системе Витамин. Данный сервис является партнером Яндекса и позволяет оптимизировать рекламные кампании. Например, одна из возможностей сервиса - автоматическое управление ставками, сэкономит вам бюджет и позволит получать клики по самой выгодной цене
+
+**2. СРОК ДЕЙСТВИЯ ДОГОВОРА**
+
+2.1. Настоящий Договор вступает в силу с даты его подписания Сторонами и действует до «{contract_end_date}» {contract_end_month} 2025 года.
+
+2.2. Договор может быть расторгнут в одностороннем порядке по инициативе одной из Сторон при условии письменного уведомления другой Стороны, но не позднее чем за 7 (семь) дней до предполагаемой даты расторжения Договора.
+
+2.3. Досрочное расторжение Договора возможно по взаимному согласию Сторон, выраженному в письменной форме.
+
+2.4. Если иное не предусмотрено в соглашении сторон о досрочном расторжении договора, прекращение действия Договора не освобождает Стороны от необходимости исполнения всех своих обязательств, предусмотренных Договором, которые не были исполнены на момент прекращения его действия, а также не освобождает Стороны от ответственности за неисполнение (ненадлежащее исполнение) обязательств.
+
+**3. ПРАВА И ОБЯЗАННОСТИ СТОРОН**
+
+**3.1. «Исполнитель» обязан:**
+
+3.1.1. Приступить к оказанию Услуг в течение трех дней с момента поступления оплаты за них.
+
+3.1.2. Консультировать Заказчика по всем вопросам, касающихся предмета данного Договора.
+
+3.1.3. Незамедлительно уведомлять «Заказчика» обо всех обстоятельствах, которые могут повлечь задержку в оказании Услуг.
+
+3.1.4. Сохранять конфиденциальность условий настоящего Договора, а также информации, полученной от «Заказчика» в связи с исполнением настоящего Договора.
+
+3.1.5. Предоставить доступы к статистике рекламных кампаний «Заказчика»».
+
+3.1.6. До конца отчетного месяца предоставлять акт выполненных работ.
+
+3.1.7. Направлять отчеты по запросу уполномоченного представителя в конце месяца оказания услуг.
+
+3.1.8. Обязуется не допускать искажения предоставляемой «Заказчиком» для размещения (распространения) информации.
+
+**3.2. «Исполнитель» вправе:**
+
+3.2.1. Требовать от «Заказчика» предоставления необходимой информации для надлежащего оказания Услуг.
+
+**3.3. «Заказчик» обязан:**
+
+3.3.1. Предоставлять «Исполнителю» информацию, необходимую для оказания Услуг по настоящему Договору.
+
+3.3.2. Оплатить Услуги в сроки и в порядке, установленные настоящим Договором.
+
+3.3.3. Подписать Акт выполненных работ, предоставленный «Исполнителем», в течение 3 (трех) рабочих дней, либо предоставить претензии по Услугам с указанием перечня необходимых доработок и сроков их исполнения. «Исполнитель» обязуется устранить замечания своими силами и за свой счет. После устранения мотивированных возражений «Исполнитель» повторно направляет Акт выполненных работ согласно процедуре, описанной в настоящем пункте Договора. В случае просрочки «Заказчика» в подписании акта и или предоставлении претензий услуги считаются оказанными надлежащим образом и принятыми «Заказчиком» в полном объеме.
+
+**3.4. «Заказчик» вправе:**
+
+3.4.1. Проверять ход и качество оказываемых «Исполнителем» услуг.
+
+3.4.2. Выдвигать требования, необходимые для надлежащего оказания Услуг.
+
+**4. ЦЕНА УСЛУГ И ПОРЯДОК РАСЧЕТОВ**
+
+4.1 Стоимость услуг по созданию рекламных кампаний составляет {service_cost} ({service_cost_words}) рублей в месяц.
+
+4.2 Полная оплата производится в день подписания настоящего договора на расчетный счет Исполнителя. В дальнейшем Заказчик оплачивает услуги ежемесячно после выставления счета Исполнителем в течение трех дней.
+
+**5. ПОРЯДОК СДАЧИ-ПРИЕМКИ УСЛУГ.**
+
+5.1. Не позднее 3 (Три) рабочих дней с момента оказания услуг ежемесячно Стороны подписывают Акт выполненных работ (далее – Акт). С момента подписания обеими Сторонами Акта услуги считаются оказанными и принятыми Сторонами без возражений и замечаний.
+
+5.2. Заказчик самостоятельно отслеживает получение акта, если в течение 03 рабочих дней после окончания периода оказания услуг акт не поступил на адрес Заказчика, то он незамедлительно сообщает об этом Исполнителю.
+
+5.3. В том случае, если в течение 3 (Три) календарных дней с момента окончания периода оказания услуг Исполнитель не получит от Заказчика обоснованной претензии, услуги соответствующего периода будут признаваться оказанными надлежащим образом и принятыми Заказчиком в полном объеме, а Акт выполненных работ (услуг) за соответствующий период приобретает юридическую силу за подписью Исполнителя. Кроме того, безусловным подтверждением надлежащего оказания Услуг за период оказания услуг является оплата выставленного Исполнителем счета за Услуги данного периода и/или предоплата за Услуги следующего периода оказания услуг.
+
+**6 ФОРС-МАЖОР**
+
+6.1. Стороны освобождаются от ответственности за частичное или полное неисполнение своих обязанностей по настоящему Договору, если Сторона, для которой сложилась невозможность исполнения своих обязанностей, докажет, что данное неисполнение или ненадлежащее исполнение явилось следствием действия обстоятельств непреодолимой силы. Такими обстоятельствами считаются стихийные бедствия, вооруженные конфликты, забастовки, издание органами государственной власти и управления нормативных актов, препятствующих исполнению настоящего Договора, а также другие события, возникшие после подписания настоящего Договора и находящиеся вне разумного предвидения и контроля Сторон.
+
+6.2. Обстоятельством непреодолимой силы признается также издание органами власти и управления актов, делающих невозможным исполнение обязательств по настоящему Договору хотя бы одной из Сторон.
+
+**7. КОНФИДЕНЦИАЛЬНОСТЬ**
+
+7.1. Любая информация, данные или сведения, полученные Сторонами в целях исполнения настоящего Договора, рассматриваются как конфиденциальные и не могут быть раскрыты третьим лицам, за исключением случаев, предусмотренных действующим законодательством Российской Федерации.
+
+7.2. Конфиденциальная информация не может быть раскрыта третьим лицам, опубликована или другим образом разглашена в течение срока действия настоящего Договора, в случае отсутствия письменного разрешения Сторон.
+
+**8. ОТВЕТСТВЕННОСТЬ СТОРОН**
+
+8.1. За неисполнение, ненадлежащее исполнение своих обязательств по настоящему Договору Стороны несут ответственность в соответствии с действующим законодательством РФ.
+
+**9. ПОРЯДОК РАЗРЕШЕНИЯ СПОРОВ**
+
+9.1. Все споры или разногласия, возникающие между Сторонами по настоящему Договору, разрешаются путем переговоров.
+
+9.2. В случае недостижения соглашения в ходе переговоров заинтересованная сторона направляет заказным письмом претензию в письменной форме, подписанную уполномоченным лицом. Срок рассмотрения претензии – 3 (три) календарных дня с даты получения претензии другой стороной.
+
+9.3. Если Сторонам не удастся достичь согласия, то любой спор, разногласие или требование, возникающие из данного Договора или касающиеся его нарушения, подлежат разрешению в соответствии с законодательством РФ.
+
+**10. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ**
+
+10.1. Настоящий Договор составлен в двух экземплярах, по одному экземпляру для каждой из Сторон.
+
+10.2. После подписания настоящего Договора все предыдущие переговоры и переписка, связанная с его заключением, теряют силу.
+
+10.3. Настоящий Договор может быть изменен и/или дополнен только документом, составленным в письменной форме, подписанным Сторонами.
+
+**11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН**
+
+| **«Исполнитель»:**<br>Индивидуальный предприниматель<br>Шамсутдинов Радис Раисович<br>Юридический адрес организации<br>423040, Россия, Республика Татарстан,<br>Нурлатский р-н, г. Нурлат,<br>ул. им Р.С. Хамадеева, д. 9, кв. 8<br>ИНН 163205154150<br>ОГРНИП 319169000185092<br>Р/с 40802810700001303517<br>Банк АО «ТБанк»<br>Юридический адрес банка<br>127287, г. Москва, ул. Хуторская 2-я,<br>д.38А, стр. 26<br>К/с 30101810145250000974<br>ИНН банка 7710140679<br>БИК 044525974<br>________________/Шамсутдинов Р.Р. | **«Заказчик»:**<br>{client_details}<br><br><br><br><br><br><br><br><br>________________/{client_signature} |
+
+"""
+
+# Models
+class Client(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    name: str
+    organization: Optional[str] = None
+    address: Optional[str] = None
+    inn: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class ClientCreate(BaseModel):
+    name: str
+    organization: Optional[str] = None
+    address: Optional[str] = None
+    inn: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
 
-# Add your routes to the router instead of directly to app
+class Contract(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    client_id: str
+    client_name: str
+    service_cost: str
+    service_cost_words: str
+    contract_end_date: str
+    contract_end_month: str
+    contract_content: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ContractCreate(BaseModel):
+    client_id: str
+    service_cost: str
+    service_cost_words: str
+    contract_end_date: str
+    contract_end_month: str
+
+# Helper function to convert MongoDB documents
+def prepare_for_mongo(data):
+    if isinstance(data.get('created_at'), datetime):
+        data['created_at'] = data['created_at'].isoformat()
+    return data
+
+def parse_from_mongo(item):
+    if isinstance(item.get('created_at'), str):
+        item['created_at'] = datetime.fromisoformat(item['created_at'])
+    return item
+
+# API Routes
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Contract Management System API"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+# Client endpoints
+@api_router.post("/clients", response_model=Client)
+async def create_client(client: ClientCreate):
+    client_dict = client.dict()
+    client_obj = Client(**client_dict)
+    client_data = prepare_for_mongo(client_obj.dict())
+    await db.clients.insert_one(client_data)
+    return client_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.get("/clients", response_model=List[Client])
+async def get_clients():
+    clients = await db.clients.find().to_list(1000)
+    return [Client(**parse_from_mongo(client)) for client in clients]
+
+@api_router.get("/clients/{client_id}", response_model=Client)
+async def get_client(client_id: str):
+    client = await db.clients.find_one({"id": client_id})
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    return Client(**parse_from_mongo(client))
+
+@api_router.put("/clients/{client_id}", response_model=Client)
+async def update_client(client_id: str, client_update: ClientCreate):
+    existing_client = await db.clients.find_one({"id": client_id})
+    if not existing_client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    updated_data = client_update.dict()
+    updated_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.clients.update_one(
+        {"id": client_id}, 
+        {"$set": prepare_for_mongo(updated_data)}
+    )
+    
+    updated_client = await db.clients.find_one({"id": client_id})
+    return Client(**parse_from_mongo(updated_client))
+
+@api_router.delete("/clients/{client_id}")
+async def delete_client(client_id: str):
+    result = await db.clients.delete_one({"id": client_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Client not found")
+    return {"message": "Client deleted successfully"}
+
+# Contract endpoints
+@api_router.post("/contracts", response_model=Contract)
+async def create_contract(contract: ContractCreate):
+    # Get client details
+    client = await db.clients.find_one({"id": contract.client_id})
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    client_obj = Client(**parse_from_mongo(client))
+    
+    # Format client details for contract
+    client_details = f"{client_obj.name}"
+    if client_obj.organization:
+        client_details = f"{client_obj.organization}\n{client_obj.name}"
+    if client_obj.address:
+        client_details += f"\n{client_obj.address}"
+    if client_obj.inn:
+        client_details += f"\nИНН {client_obj.inn}"
+    if client_obj.phone:
+        client_details += f"\nТел.: {client_obj.phone}"
+    if client_obj.email:
+        client_details += f"\nEmail: {client_obj.email}"
+    
+    # Generate contract content
+    contract_content = CONTRACT_TEMPLATE.format(
+        client_name=client_obj.name,
+        service_cost=contract.service_cost,
+        service_cost_words=contract.service_cost_words,
+        contract_end_date=contract.contract_end_date,
+        contract_end_month=contract.contract_end_month,
+        client_details=client_details,
+        client_signature=client_obj.name
+    )
+    
+    # Create contract object
+    contract_dict = contract.dict()
+    contract_dict["client_name"] = client_obj.name
+    contract_dict["contract_content"] = contract_content
+    contract_obj = Contract(**contract_dict)
+    
+    # Save to database
+    contract_data = prepare_for_mongo(contract_obj.dict())
+    await db.contracts.insert_one(contract_data)
+    
+    return contract_obj
+
+@api_router.get("/contracts", response_model=List[Contract])
+async def get_contracts():
+    contracts = await db.contracts.find().to_list(1000)
+    return [Contract(**parse_from_mongo(contract)) for contract in contracts]
+
+@api_router.get("/contracts/{contract_id}", response_model=Contract)
+async def get_contract(contract_id: str):
+    contract = await db.contracts.find_one({"id": contract_id})
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    return Contract(**parse_from_mongo(contract))
+
+@api_router.delete("/contracts/{contract_id}")
+async def delete_contract(contract_id: str):
+    result = await db.contracts.delete_one({"id": contract_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    return {"message": "Contract deleted successfully"}
 
 # Include the router in the main app
 app.include_router(api_router)
