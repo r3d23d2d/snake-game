@@ -477,7 +477,43 @@ async def create_client(client: ClientCreate):
 @api_router.get("/clients", response_model=List[Client])
 async def get_clients():
     clients = await db.clients.find().to_list(1000)
-    return [Client(**parse_from_mongo(client)) for client in clients]
+    result_clients = []
+    
+    for client in clients:
+        client_parsed = parse_from_mongo(client)
+        
+        # Handle backward compatibility - convert old format to new format
+        if 'name' in client_parsed and 'name_or_organization' not in client_parsed:
+            # Old format - convert to new format
+            name_or_org = client_parsed.get('name', '')
+            if client_parsed.get('organization'):
+                name_or_org = client_parsed.get('organization')
+            
+            other_details_parts = []
+            if client_parsed.get('name') and client_parsed.get('organization'):
+                other_details_parts.append(client_parsed.get('name'))
+            if client_parsed.get('address'):
+                other_details_parts.append(client_parsed.get('address'))
+            if client_parsed.get('inn'):
+                other_details_parts.append(f"ИНН {client_parsed.get('inn')}")
+            if client_parsed.get('phone'):
+                other_details_parts.append(f"Тел.: {client_parsed.get('phone')}")
+            if client_parsed.get('email'):
+                other_details_parts.append(f"Email: {client_parsed.get('email')}")
+            
+            client_data = {
+                'id': client_parsed.get('id'),
+                'name_or_organization': name_or_org,
+                'other_details': '\n'.join(other_details_parts) if other_details_parts else None,
+                'created_at': client_parsed.get('created_at')
+            }
+        else:
+            # New format - use as is
+            client_data = client_parsed
+            
+        result_clients.append(Client(**client_data))
+    
+    return result_clients
 
 @api_router.get("/clients/{client_id}", response_model=Client)
 async def get_client(client_id: str):
