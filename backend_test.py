@@ -104,8 +104,8 @@ class ContractSystemTester:
         )
         
         if success:
-            print(f"   Client name: {response.get('name', 'N/A')}")
-            print(f"   Organization: {response.get('organization', 'N/A')}")
+            print(f"   Client name/organization: {response.get('name_or_organization', 'N/A')}")
+            print(f"   Other details: {response.get('other_details', 'N/A')}")
             return True
         return False
 
