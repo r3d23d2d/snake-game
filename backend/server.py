@@ -820,6 +820,7 @@ async def download_contract_direct_word(contract_id: str):
         "service_cost_words": contract_obj.service_cost_words,
         "contract_end_date": contract_obj.contract_end_date,
         "contract_end_month": contract_obj.contract_end_month,
+        "contract_end_year": contract_obj.contract_end_year,
         "client_details": contract_obj.client_details
     }
     
