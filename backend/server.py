@@ -922,6 +922,7 @@ async def create_contract(contract: ContractCreate):
     
     # Generate contract content
     contract_content = CONTRACT_TEMPLATE.format(
+        contract_number="[Номер договора]",  # Legacy contracts don't have auto-generated numbers
         client_name=client_name_in_contract,
         service_cost=contract.service_cost,
         service_cost_words=contract.service_cost_words,
