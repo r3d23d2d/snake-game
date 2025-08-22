@@ -576,30 +576,13 @@ function App() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      <div>
-                        <h3 className="font-semibold text-slate-800 mb-2">Информация о клиенте:</h3>
-                        <div className="bg-slate-50 p-3 rounded-lg">
-                          <p className="font-medium">{currentContract.client_name}</p>
-                          {currentContract.client_details.includes('\n') && (
-                            <p className="text-sm text-slate-600 mt-1 whitespace-pre-wrap">
-                              {currentContract.client_details.split('\n').slice(1).join('\n')}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm text-slate-600">Стоимость:</p>
-                          <p className="font-semibold">{currentContract.service_cost.toLocaleString()} руб/мес</p>
-                          <p className="text-xs text-slate-500">({currentContract.service_cost_words})</p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-slate-600">Срок действия:</p>
-                          <p className="font-semibold">
-                            До {currentContract.contract_end_date} {currentContract.contract_end_month} {currentContract.contract_end_year || '2025'}
-                          </p>
-                        </div>
+                      <div className="text-center">
+                        <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                          Договор об оказании услуг для {currentContract.client_name}
+                        </h3>
+                        <p className="text-sm text-slate-600">
+                          № {currentContract.contract_number}
+                        </p>
                       </div>
 
                       <details className="mt-4">
