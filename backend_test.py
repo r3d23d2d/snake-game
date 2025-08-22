@@ -196,6 +196,73 @@ class ContractSystemTester:
             return True
         return False
 
+    def test_download_contract_word(self):
+        """Test downloading contract in Word format - NEW FUNCTIONALITY"""
+        if not self.created_contract_id:
+            print("❌ No contract ID available for download testing")
+            return False
+            
+        url = f"{self.api_url}/contracts/{self.created_contract_id}/download"
+        
+        self.tests_run += 1
+        print(f"\n🔍 Testing Download Contract Word...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url)
+            
+            success = response.status_code == 200
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                
+                # Check Content-Type header
+                content_type = response.headers.get('Content-Type', '')
+                expected_content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                if expected_content_type in content_type:
+                    print("   ✅ Correct Content-Type for Word document")
+                else:
+                    print(f"   ❌ Wrong Content-Type: {content_type}")
+                
+                # Check Content-Disposition header for filename
+                content_disposition = response.headers.get('Content-Disposition', '')
+                if 'attachment' in content_disposition and 'filename=' in content_disposition:
+                    print("   ✅ Correct Content-Disposition header with filename")
+                    # Extract filename
+                    filename_part = content_disposition.split('filename=')[1]
+                    print(f"   📄 Filename: {filename_part}")
+                    
+                    # Check if filename contains client name and .docx extension
+                    if 'Иванов_Иван_Иванович' in filename_part and '.docx' in filename_part:
+                        print("   ✅ Filename contains client name and .docx extension")
+                    else:
+                        print("   ❌ Filename format incorrect")
+                else:
+                    print(f"   ❌ Wrong Content-Disposition: {content_disposition}")
+                
+                # Check file size (Word documents should have reasonable size)
+                content_length = len(response.content)
+                if content_length > 1000:  # At least 1KB for a Word document
+                    print(f"   ✅ File size reasonable: {content_length} bytes")
+                else:
+                    print(f"   ❌ File size too small: {content_length} bytes")
+                
+                # Check if it's actually a Word document by checking magic bytes
+                if response.content.startswith(b'PK'):  # ZIP-based format (Word .docx)
+                    print("   ✅ File appears to be a valid Word document (ZIP-based)")
+                else:
+                    print("   ❌ File does not appear to be a valid Word document")
+                
+                return True
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                print(f"   Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False
+
     def test_delete_contract(self):
         """Test deleting a contract"""
         if not self.created_contract_id:
