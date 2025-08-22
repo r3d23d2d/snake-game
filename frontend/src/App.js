@@ -24,14 +24,10 @@ function App() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  // Client form state
+  // Client form state - simplified to 2 fields
   const [clientForm, setClientForm] = useState({
-    name: '',
-    organization: '',
-    address: '',
-    inn: '',
-    phone: '',
-    email: ''
+    name_or_organization: '',
+    other_details: ''
   });
 
   // Contract form state
