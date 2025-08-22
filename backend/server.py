@@ -31,6 +31,103 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Number to words conversion function for Russian rubles
+def number_to_words_ru(num):
+    """Convert integer to Russian words for rubles"""
+    if num == 0:
+        return "ноль рублей"
+    
+    ones = ["", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"]
+    teens = ["десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", 
+             "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"]
+    tens = ["", "", "двадцать", "тридцать", "сорок", "пятьдесят", "шестьдесят", 
+            "семьдесят", "восемьдесят", "девяносто"]
+    hundreds = ["", "сто", "двести", "триста", "четыреста", "пятьсот", 
+                "шестьсот", "семьсот", "восемьсот", "девятьсот"]
+    
+    thousands = ["", "тысяча", "тысячи", "тысяч"]
+    millions = ["", "миллион", "миллиона", "миллионов"]
+    
+    def get_case_for_number(n, forms):
+        """Get correct case for Russian numbers"""
+        if n % 100 in [11, 12, 13, 14]:
+            return forms[3]  # genitive plural for teens
+        elif n % 10 == 1:
+            return forms[1]  # nominative singular
+        elif n % 10 in [2, 3, 4]:
+            return forms[2]  # genitive singular
+        else:
+            return forms[3]  # genitive plural
+    
+    def convert_hundreds(n):
+        """Convert numbers up to 999"""
+        result = []
+        
+        h = n // 100
+        if h > 0:
+            result.append(hundreds[h])
+        
+        remainder = n % 100
+        
+        if remainder >= 10 and remainder < 20:
+            result.append(teens[remainder - 10])
+        else:
+            t = remainder // 10
+            if t > 0:
+                result.append(tens[t])
+            
+            o = remainder % 10
+            if o > 0:
+                result.append(ones[o])
+        
+        return " ".join(result)
+    
+    if num >= 1000000:
+        millions_part = num // 1000000
+        millions_word = convert_hundreds(millions_part)
+        millions_case = get_case_for_number(millions_part, millions)
+        result = f"{millions_word} {millions_case}"
+        
+        remainder = num % 1000000
+        if remainder > 0:
+            result += " " + number_to_words_ru(remainder)
+        
+        return result
+    
+    elif num >= 1000:
+        thousands_part = num // 1000
+        thousands_word = convert_hundreds(thousands_part)
+        
+        # Special case for feminine thousands
+        if thousands_part % 10 == 1 and thousands_part % 100 != 11:
+            thousands_word = thousands_word.replace("один", "одна")
+        elif thousands_part % 10 == 2 and thousands_part % 100 != 12:
+            thousands_word = thousands_word.replace("два", "две")
+        
+        thousands_case = get_case_for_number(thousands_part, thousands)
+        result = f"{thousands_word} {thousands_case}"
+        
+        remainder = num % 1000
+        if remainder > 0:
+            result += " " + number_to_words_ru(remainder)
+        
+        return result
+    
+    else:
+        # Numbers less than 1000
+        word = convert_hundreds(num)
+        
+        # Add ruble case
+        ruble_forms = ["", "рубль", "рубля", "рублей"]
+        ruble_case = get_case_for_number(num, ruble_forms)
+        
+        return f"{word} {ruble_case}"
+
+def generate_contract_number():
+    """Generate contract number based on current date: КР + DD.MM.YY"""
+    now = datetime.now(timezone.utc)
+    return f"КР{now.strftime('%d.%m.%y')}"
+
 # Contract template - the default contract
 CONTRACT_TEMPLATE = """**Договор об оказании услуг № КР____**
 
