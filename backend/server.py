@@ -358,7 +358,7 @@ def create_word_contract(contract_data):
     # Title
     title = doc.add_paragraph()
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title_run = title.add_run("Договор об оказании услуг № КР____")
+    title_run = title.add_run(f"Договор об оказании услуг № {contract_data['contract_number']}")
     title_run.bold = True
     title_run.font.size = Pt(14)
     
