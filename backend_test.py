@@ -594,6 +594,8 @@ class DirectContractTester:
         except Exception as e:
             print(f"❌ Failed - Error: {str(e)}")
             return False
+
+    def test_word_download(self):
         """Test Word document download with GET /api/contracts/direct/{id}/download"""
         # Create a contract for download testing
         contract_data = {
