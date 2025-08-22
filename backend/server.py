@@ -589,6 +589,9 @@ def create_word_contract(contract_data):
         client_detail_run = client_detail_para.add_run(detail)
         client_detail_run.font.name = 'Times New Roman'
         client_detail_run.font.size = Pt(11)
+        # Make paragraph spacing more compact
+        client_detail_para.space_after = Pt(0)
+        client_detail_para.space_before = Pt(0)
     
     # Add empty lines to match executor height
     for _ in range(max(0, len(executor_details) - len(client_details_lines))):
