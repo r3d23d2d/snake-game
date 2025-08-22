@@ -53,18 +53,14 @@ class ContractSystemTester:
         return self.run_test("API Root", "GET", "", 200)
 
     def test_create_client(self):
-        """Test creating a client with Russian test data"""
+        """Test creating a client with simplified structure (2 fields)"""
         client_data = {
-            "name": "Иванов Иван Иванович",
-            "organization": "ООО \"Тестовая компания\"",
-            "address": "Москва, ул. Тестовая, 1",
-            "inn": "1234567890",
-            "phone": "+7(999)123-45-67",
-            "email": "test@test.ru"
+            "name_or_organization": "ООО Новая Компания",
+            "other_details": "Директор: Сидоров С.С.\nМосква, ул. Тверская, 15\nИНН 1122334455\nТел: +7(495)123-45-67\nEmail: info@newcompany.ru"
         }
         
         success, response = self.run_test(
-            "Create Client",
+            "Create Client (Simplified Structure)",
             "POST",
             "clients",
             200,
