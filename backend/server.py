@@ -530,18 +530,18 @@ async def create_contract(contract: ContractCreate):
     
     # Generate contract content
     contract_content = CONTRACT_TEMPLATE.format(
-        client_name=client_obj.name,
+        client_name=client_name_in_contract,
         service_cost=contract.service_cost,
         service_cost_words=contract.service_cost_words,
         contract_end_date=contract.contract_end_date,
         contract_end_month=contract.contract_end_month,
         client_details=client_details,
-        client_signature=client_obj.name
+        client_signature=client_name_in_contract
     )
     
     # Create contract object
     contract_dict = contract.dict()
-    contract_dict["client_name"] = client_obj.name
+    contract_dict["client_name"] = client_name_in_contract
     contract_dict["contract_content"] = contract_content
     contract_obj = Contract(**contract_dict)
     
