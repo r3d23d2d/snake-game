@@ -161,7 +161,7 @@ def calculate_contract_end_date(duration_months: int):
     return str(end_date.day), months_ru[end_date.month]
 
 # Contract template - the default contract
-CONTRACT_TEMPLATE = """**Договор об оказании услуг № КР____**
+CONTRACT_TEMPLATE = """**Договор об оказании услуг № {contract_number}**
 
 г. Казань «___» 2025 г.
 
