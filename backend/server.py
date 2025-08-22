@@ -586,18 +586,10 @@ async def download_contract_word(contract_id: str):
     
     client_obj = Client(**parse_from_mongo(client))
     
-    # Format client details
-    client_details = f"{client_obj.name}"
-    if client_obj.organization:
-        client_details = f"{client_obj.organization}\n{client_obj.name}"
-    if client_obj.address:
-        client_details += f"\n{client_obj.address}"
-    if client_obj.inn:
-        client_details += f"\nИНН {client_obj.inn}"
-    if client_obj.phone:
-        client_details += f"\nТел.: {client_obj.phone}"
-    if client_obj.email:
-        client_details += f"\nEmail: {client_obj.email}"
+    # Format client details for Word document - use new structure
+    client_details = client_obj.name_or_organization
+    if client_obj.other_details:
+        client_details += f"\n{client_obj.other_details}"
     
     # Prepare contract data for Word generation
     contract_data = {
