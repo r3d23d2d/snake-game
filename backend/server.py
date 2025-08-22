@@ -381,15 +381,41 @@ def create_word_contract(contract_data):
     style.font.name = 'Times New Roman'
     style.font.size = Pt(11)
     
+    # Header with Kazan (left) and contract signing date (right)
+    header_para = doc.add_paragraph()
+    header_para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+    
+    # Add "Казань" on the left
+    left_run = header_para.add_run("Казань")
+    left_run.font.name = 'Times New Roman'
+    left_run.font.size = Pt(11)
+    
+    # Add spaces to push the date to the right
+    spacer_run = header_para.add_run("\t" * 10)  # Use tabs for alignment
+    
+    # Add current date on the right
+    current_date = datetime.now(timezone.utc)
+    date_str = f'«{current_date.day}» {current_date.strftime("%B")} {current_date.year} г.'
+    # Replace English month names with Russian
+    months_map = {
+        'January': 'января', 'February': 'февраля', 'March': 'марта', 'April': 'апреля',
+        'May': 'мая', 'June': 'июня', 'July': 'июля', 'August': 'августа',
+        'September': 'сентября', 'October': 'октября', 'November': 'ноября', 'December': 'декабря'
+    }
+    for eng_month, ru_month in months_map.items():
+        date_str = date_str.replace(eng_month, ru_month)
+    
+    right_run = header_para.add_run(date_str)
+    right_run.font.name = 'Times New Roman'
+    right_run.font.size = Pt(11)
+    
+    # Empty line after header
+    doc.add_paragraph()
+    
     # Title
     add_formatted_paragraph(doc, 
         f"Договор об оказании услуг № {contract_data['contract_number']}", 
         bold=True, 
-        alignment=WD_ALIGN_PARAGRAPH.CENTER)
-    
-    # Location and date
-    add_formatted_paragraph(doc, 
-        'г. Казань «___» 2025 г.', 
         alignment=WD_ALIGN_PARAGRAPH.CENTER)
     
     # Contract parties
