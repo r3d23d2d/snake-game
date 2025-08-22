@@ -900,10 +900,14 @@ async def download_contract_direct_word(contract_id: str):
     
     filename = f"Dogovor_{safe_client_name}_{safe_contract_number}.docx"
     
+    # Use filename* parameter for better Unicode support
+    from urllib.parse import quote
+    filename_encoded = quote(filename.encode('utf-8'))
+    
     return StreamingResponse(
         io.BytesIO(doc_buffer.read()),
         media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{filename_encoded}"}
     )
 
 # Contract endpoints
