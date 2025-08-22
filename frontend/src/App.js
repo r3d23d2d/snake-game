@@ -440,6 +440,7 @@ function App() {
                                   size="sm"
                                   onClick={() => viewContract(contract)}
                                   className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                  title="Просмотр договора"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Button>
@@ -459,10 +460,20 @@ function App() {
                               </DialogContent>
                             </Dialog>
                             <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => downloadContract(contract.id, contract.client_name)}
+                              className="text-green-600 border-green-200 hover:bg-green-50"
+                              title="Скачать в Word"
+                            >
+                              <Download className="w-4 h-4" />
+                            </Button>
+                            <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => deleteContract(contract.id)}
                               className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              title="Удалить договор"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
