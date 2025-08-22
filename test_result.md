@@ -211,10 +211,55 @@ backend:
           agent: "testing"
           comment: "✅ TESTED: Fixed missing POST /api/contracts endpoint for legacy contract creation. Added proper decorator and fixed template formatting issues. Legacy contracts now work alongside new direct contracts."
 
+  - task: "Fix contract end date calculation to include year"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User reported that contract duration calculation is incorrect - half year from August 2025 shows end date as February 2025 instead of 2026"
+        - working: false
+          agent: "main"
+          comment: "Fixed calculate_contract_end_date function to return year, updated ContractNew model to include contract_end_year field, and updated all related API endpoints to use dynamic year instead of hardcoded 2025"
+
+  - task: "Add Kazan and contract signing date to Word document header"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User requested to add 'Казань' on left and automatic contract signing date on right in Word document header"
+        - working: false
+          agent: "main"
+          comment: "Added header with 'Казань' on left and current date with Russian month names on right, removed old centered date format"
+
+  - task: "Move section 11 to new page and compact executor details"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User requested section 11 (signatures and details) to start on new page with more compact formatting"
+        - working: false
+          agent: "main"
+          comment: "Added page break before section 11, compacted executor details from 16 lines to 6 lines, maintained all essential information"
+
 frontend:
   - task: "Create single page layout instead of tabs"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "high"
@@ -223,10 +268,13 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "Replace tabs with single page showing form and created contract"
+        - working: true
+          agent: "main"
+          comment: "Completed rewrite of App.js to single page layout with contract form and inline display"
 
   - task: "Add cost field with automatic words conversion"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "high"  
@@ -235,10 +283,13 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "Add cost input field that auto-generates cost in words"
+        - working: true
+          agent: "main"
+          comment: "Added cost input field with placeholder for automatic conversion, backend handles the conversion"
 
   - task: "Add contract duration selection (month/6months/year)"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "medium"
@@ -247,10 +298,13 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "Add dropdown for contract duration with 6 months as default"
+        - working: true
+          agent: "main"
+          comment: "Added select dropdown with 1 month, 6 months, and 1 year options, defaulting to 6 months"
 
   - task: "Show created contract inline with edit capability"
-    implemented: false
-    working: "NA"
+    implemented: true
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "high"
@@ -259,6 +313,24 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "Display contract below form with view/edit/download options"
+        - working: true
+          agent: "main"
+          comment: "Implemented inline contract display with edit mode, save functionality, and Word download capability"
+
+  - task: "Update frontend to display correct contract end year"
+    implemented: true
+    working: false
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Frontend needs to display dynamic year instead of hardcoded 2025"
+        - working: false
+          agent: "main"
+          comment: "Updated contract display to show contract_end_year from backend with fallback to 2025 for legacy contracts"
 
 metadata:
   created_by: "main_agent"
