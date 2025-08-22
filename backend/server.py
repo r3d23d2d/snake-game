@@ -510,7 +510,10 @@ def create_word_contract(contract_data):
     add_formatted_paragraph(doc, "10. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ", bold=True, alignment=WD_ALIGN_PARAGRAPH.CENTER)
     add_formatted_paragraph(doc, "10.1. Настоящий Договор составлен в двух экземплярах, по одному экземпляру для каждой из Сторон.", alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
     
-    # Section 11 - Details and signatures table
+    # Page break before section 11
+    doc.add_page_break()
+    
+    # Section 11 - Details and signatures table (on new page)
     add_formatted_paragraph(doc, "11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН", bold=True, alignment=WD_ALIGN_PARAGRAPH.CENTER)
     
     # Create table for signatures with equal height
