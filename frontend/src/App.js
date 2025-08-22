@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./com
 import { Textarea } from "./components/ui/textarea";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
-import { FileText, Eye, Edit, Download, Save, X } from "lucide-react";
+import { FileText, Eye, Edit, Download, Save, X, FileEdit } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
