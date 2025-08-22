@@ -1874,6 +1874,7 @@ def main():
     
     # Direct contract test sequence
     direct_test_sequence = [
+        ("Contract Content Editing Workflow", direct_tester.test_contract_content_editing_workflow),
         ("Number to Words Conversion", direct_tester.test_number_to_words_conversion),
         ("Contract Number Generation", direct_tester.test_contract_number_generation),
         ("Contract End Date Calculation", direct_tester.test_contract_end_date_calculation),
