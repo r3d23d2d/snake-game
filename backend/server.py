@@ -922,6 +922,128 @@ async def download_contract_direct_word(contract_id: str):
         headers={"Content-Disposition": f"attachment; filename*=UTF-8''{filename_encoded}"}
     )
 
+@api_router.put("/contracts/direct/{contract_id}/content", response_model=ContractNew)
+async def update_contract_content(contract_id: str, content_update: ContractContentUpdate):
+    """Update only the contract content text"""
+    existing_contract = await db.contracts_new.find_one({"id": contract_id})
+    if not existing_contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    # Update only the contract_content field
+    await db.contracts_new.update_one(
+        {"id": contract_id},
+        {"$set": {"contract_content": content_update.contract_content}}
+    )
+    
+    updated_contract = await db.contracts_new.find_one({"id": contract_id})
+    return ContractNew(**parse_from_mongo(updated_contract))
+
+@api_router.get("/contracts/direct/{contract_id}/download_custom")
+async def download_custom_contract_word(contract_id: str):
+    """Download contract with custom edited content as Word document"""
+    # Get contract from database
+    contract = await db.contracts_new.find_one({"id": contract_id})
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    contract_obj = ContractNew(**parse_from_mongo(contract))
+    
+    # Create Word document with custom content
+    doc = Document()
+    
+    # Set document margins and style
+    section = doc.sections[0]
+    section.top_margin = Inches(0.8)
+    section.bottom_margin = Inches(0.8)
+    section.left_margin = Inches(0.8)
+    section.right_margin = Inches(0.8)
+    
+    # Add header with Kazan and date
+    header_table = doc.add_table(rows=1, cols=2)
+    header_table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    header_table.columns[0].width = Inches(3)
+    header_table.columns[1].width = Inches(3)
+    
+    # Left cell - Kazan
+    left_cell = header_table.cell(0, 0)
+    left_para = left_cell.paragraphs[0]
+    left_run = left_para.add_run("Казань")
+    left_run.font.name = 'Times New Roman'
+    left_run.font.size = Pt(11)
+    left_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    
+    # Right cell - Date
+    right_cell = header_table.cell(0, 1)
+    right_para = right_cell.paragraphs[0]
+    current_date = datetime.now(timezone(timedelta(hours=3)))
+    months_ru = ["января", "февраля", "марта", "апреля", "мая", "июня",
+                 "июля", "августа", "сентября", "октября", "ноября", "декабря"]
+    date_str = f"{current_date.day} {months_ru[current_date.month - 1]} {current_date.year} г."
+    right_run = right_para.add_run(date_str)
+    right_run.font.name = 'Times New Roman'
+    right_run.font.size = Pt(11)
+    right_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    
+    # Add contract title at the very top
+    title_para = doc.add_paragraph()
+    title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    title_run = title_para.add_run(f"Договор об оказании услуг № {contract_obj.contract_number}")
+    title_run.font.name = 'Times New Roman'
+    title_run.font.size = Pt(14)
+    title_run.bold = True
+    
+    # Add custom content as paragraphs
+    content_lines = contract_obj.contract_content.split('\n')
+    for line in content_lines:
+        if line.strip():
+            para = doc.add_paragraph()
+            run = para.add_run(line)
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(11)
+            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+        else:
+            # Add empty paragraph for spacing
+            doc.add_paragraph()
+    
+    # Save to BytesIO
+    doc_buffer = io.BytesIO()
+    doc.save(doc_buffer)
+    doc_buffer.seek(0)
+    
+    # Create filename
+    safe_client_name = contract_obj.client_name.replace(' ', '_')
+    cyrillic_to_latin = {
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh', 'з': 'z',
+        'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
+        'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch',
+        'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+        'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'E', 'Ж': 'Zh', 'З': 'Z',
+        'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P',
+        'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch',
+        'Ш': 'Sh', 'Щ': 'Sch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+    }
+    
+    for cyrillic, latin in cyrillic_to_latin.items():
+        safe_client_name = safe_client_name.replace(cyrillic, latin)
+    
+    safe_client_name = ''.join(c for c in safe_client_name if c.isalnum() or c in ['_', '-'])
+    if not safe_client_name:
+        safe_client_name = "Contract"
+    
+    safe_contract_number = contract_obj.contract_number.replace('.', '_').replace(' ', '_')
+    safe_contract_number = ''.join(c for c in safe_contract_number if c.isalnum() or c in ['_', '-'])
+    
+    filename = f"Dogovor_custom_{safe_client_name}_{safe_contract_number}.docx"
+    
+    from urllib.parse import quote
+    filename_encoded = quote(filename.encode('utf-8'))
+    
+    return StreamingResponse(
+        io.BytesIO(doc_buffer.read()),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{filename_encoded}"}
+    )
+
 # Contract endpoints
 @api_router.post("/contracts", response_model=Contract)
 async def create_contract(contract: ContractCreate):
