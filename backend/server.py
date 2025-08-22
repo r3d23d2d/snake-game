@@ -401,8 +401,9 @@ def create_word_contract(contract_data):
     # Add spaces to push the date to the right
     spacer_run = header_para.add_run("\t" * 10)  # Use tabs for alignment
     
-    # Add current date on the right
-    current_date = datetime.now(timezone.utc)
+    # Add current date on the right (Moscow time)
+    moscow_tz = timezone(timedelta(hours=3))
+    current_date = datetime.now(moscow_tz)
     date_str = f'«{current_date.day}» {current_date.strftime("%B")} {current_date.year} г.'
     # Replace English month names with Russian
     months_map = {
