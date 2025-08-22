@@ -399,11 +399,11 @@ frontend:
 
   - task: "Update frontend to display correct contract end year"
     implemented: true
-    working: false
+    working: true
     file: "App.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
@@ -411,6 +411,54 @@ frontend:
         - working: false
           agent: "main"
           comment: "Updated contract display to show contract_end_year from backend with fallback to 2025 for legacy contracts"
+        - working: true
+          agent: "main"
+          comment: "Frontend displays contract end year correctly based on backend calculations"
+
+  - task: "Remove unwanted descriptive text from page header"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User requested removal of text 'Создавайте договоры с автоматической генерацией номера и стоимости прописью'"
+        - working: true
+          agent: "main"
+          comment: "Removed unwanted text and replaced with 'Создание и редактирование договоров об оказании услуг'"
+
+  - task: "Add contract content editing interface"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User requested ability to edit contract document content in the interface"
+        - working: true
+          agent: "main"
+          comment: "Added contract content editing interface with textarea, save/cancel buttons, and integration with backend content editing endpoints. Added FileEdit icon and separate editing state."
+
+  - task: "Simplify contract display interface"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User requested simplified interface - remove detailed client info, cost, and dates, keep only contract title and action buttons"
+        - working: true
+          agent: "main"
+          comment: "Simplified contract display to show only contract title with genitive case name, contract number, and action buttons. Removed detailed client information, cost, and term details from main view."
 
 metadata:
   created_by: "main_agent"
