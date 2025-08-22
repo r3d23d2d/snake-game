@@ -1036,12 +1036,7 @@ async def download_custom_contract_word(contract_id: str):
     # Add contract title at the very top
     title_para = doc.add_paragraph()
     title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    
-    # Get client name in genitive case for title
-    client_genitive = to_genitive_case(contract_obj.client_name)
-    title_text = f"Договор об оказании услуг для {client_genitive} № {contract_obj.contract_number}"
-    
-    title_run = title_para.add_run(title_text)
+    title_run = title_para.add_run(f"Договор об оказании услуг № {contract_obj.contract_number}")
     title_run.font.name = 'Times New Roman'
     title_run.font.size = Pt(14)
     title_run.bold = True
