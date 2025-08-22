@@ -97,20 +97,6 @@ function App() {
     setLoading(false);
   };
 
-  const handleEditContract = () => {
-    if (currentContract) {
-      setEditForm({
-        name_or_organization: currentContract.client_name,
-        other_details: currentContract.client_details.includes('\n') 
-          ? currentContract.client_details.split('\n').slice(1).join('\n')
-          : '',
-        service_cost: currentContract.service_cost.toString(),
-        duration_months: calculateDurationFromDates(currentContract.contract_start_date, currentContract.contract_end_date)
-      });
-      setIsEditing(true);
-    }
-  };
-
   const handleEditContent = () => {
     if (currentContract) {
       setEditedContent(currentContract.contract_content);
