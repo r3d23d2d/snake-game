@@ -141,7 +141,8 @@ def generate_contract_number():
 
 def calculate_contract_end_date(duration_months: int):
     """Calculate contract end date based on duration"""
-    now = datetime.now(timezone.utc)
+    moscow_tz = timezone(timedelta(hours=3))
+    now = datetime.now(moscow_tz)
     
     # Calculate end month
     end_month = now.month + duration_months
