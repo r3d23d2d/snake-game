@@ -455,7 +455,7 @@ function App() {
                         <option value="">Выберите клиента</option>
                         {clients.map((client) => (
                           <option key={client.id} value={client.id}>
-                            {client.name} {client.organization && `(${client.organization})`}
+                            {client.name_or_organization}
                           </option>
                         ))}
                       </select>
