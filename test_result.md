@@ -101,3 +101,117 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Пользователь запросил изменение существующего приложения управления договорами:
+  1. Сделать единую страницу вместо вкладок
+  2. Добавить поле "стоимость" с автоматической генерацией прописного варианта  
+  3. Добавить поле "дата окончания" с выбором (месяц/полгода/год, по умолчанию полгода)
+  4. Автоматическая генерация номера договора по дате создания (КР + ДД.ММ.ГГ)
+  5. Показывать созданный договор inline с возможностью редактирования и скачивания
+  6. Убрать сохранение клиентов в базу данных
+
+backend:
+  - task: "Add number-to-words conversion function"
+    implemented: false
+    working: "NA"
+    file: "server.py"  
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Need to create function to convert numbers to Russian words for rubles"
+
+  - task: "Update contract model for auto-generated contract number"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0  
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Add automatic contract number generation based on creation date"
+
+  - task: "Remove client storage requirement and add direct contract creation"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"  
+          comment: "Remove client CRUD, create contracts directly with client data"
+
+frontend:
+  - task: "Create single page layout instead of tabs"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Replace tabs with single page showing form and created contract"
+
+  - task: "Add cost field with automatic words conversion"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"  
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Add cost input field that auto-generates cost in words"
+
+  - task: "Add contract duration selection (month/6months/year)"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Add dropdown for contract duration with 6 months as default"
+
+  - task: "Show created contract inline with edit capability"
+    implemented: false
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Display contract below form with view/edit/download options"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Add number-to-words conversion function"
+    - "Update contract model for auto-generated contract number"
+    - "Create single page layout instead of tabs"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "main"
+      message: "Starting implementation of unified contract management page with new requirements. Will begin with backend changes for number conversion and auto-generated contract numbers."
