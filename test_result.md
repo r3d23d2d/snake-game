@@ -340,7 +340,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Frontend implementation and integration"
+    - "Fix contract end date calculation to include year"
+    - "Add Kazan and contract signing date to Word document header"
+    - "Move section 11 to new page and compact executor details"
+    - "Update frontend to display correct contract end year"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -350,3 +353,5 @@ agent_communication:
       message: "Starting implementation of unified contract management page with new requirements. Will begin with backend changes for number conversion and auto-generated contract numbers."
     - agent: "testing"
       message: "✅ BACKEND TESTING COMPLETE: All new direct contract functionality has been thoroughly tested and is working correctly. Tested 37 test cases with 100% success rate. Key achievements: (1) Number-to-words conversion working for all amounts including proper Russian cases, (2) Auto contract number generation (КР + DD.MM.YY format), (3) Contract end date calculation with Russian months, (4) Complete direct contract CRUD API, (5) Word document generation with proper Unicode filename handling, (6) Fixed legacy contract creation endpoint. Backend is ready for frontend integration. Minor fixes applied during testing: fixed ruble suffix for thousands/millions, fixed filename encoding for Cyrillic characters, added missing POST endpoint for legacy contracts."
+    - agent: "main"
+      message: "Implemented user-requested improvements: (1) Fixed contract end date calculation to return correct year (2026 for 6 months from Aug 2025), (2) Added 'Казань' and automatic signing date to Word document header, (3) Moved section 11 to new page with compacted executor details, (4) Updated frontend to display dynamic year. All changes implemented, need backend testing to verify functionality."
