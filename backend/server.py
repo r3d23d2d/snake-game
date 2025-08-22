@@ -357,20 +357,26 @@ def create_word_contract(contract_data):
     """Create a Word document with the contract content"""
     doc = Document()
     
-    # Set document margins
+    # Set document margins - smaller margins to fit content in 3 pages
     sections = doc.sections
     for section in sections:
-        section.top_margin = Inches(1)
-        section.bottom_margin = Inches(1)
-        section.left_margin = Inches(1.25)
-        section.right_margin = Inches(1.25)
+        section.top_margin = Inches(0.8)
+        section.bottom_margin = Inches(0.8)
+        section.left_margin = Inches(1)
+        section.right_margin = Inches(1)
+    
+    # Set default font for entire document
+    style = doc.styles['Normal']
+    style.font.name = 'Times New Roman'
+    style.font.size = Pt(11)
     
     # Title
     title = doc.add_paragraph()
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     title_run = title.add_run(f"Договор об оказании услуг № {contract_data['contract_number']}")
     title_run.bold = True
-    title_run.font.size = Pt(14)
+    title_run.font.name = 'Times New Roman'
+    title_run.font.size = Pt(11)
     
     # Location and date
     loc_date = doc.add_paragraph()
