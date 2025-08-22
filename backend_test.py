@@ -1128,6 +1128,7 @@ def main():
         ("Direct Contract Creation", direct_tester.test_direct_contract_creation),
         ("Contract Retrieval", direct_tester.test_contract_retrieval),
         ("Contract Updates", direct_tester.test_contract_updates),
+        ("Word Document Improvements", direct_tester.test_word_document_improvements),
         ("Word Download", direct_tester.test_word_download),
     ]
     
