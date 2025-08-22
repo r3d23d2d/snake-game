@@ -745,7 +745,8 @@ async def create_contract_direct(contract_data: ContractData):
     )
     
     # Create contract object
-    now = datetime.now(timezone.utc)
+    moscow_tz = timezone(timedelta(hours=3))
+    now = datetime.now(moscow_tz)
     contract_obj = ContractNew(
         contract_number=contract_number,
         client_name=client_name_in_contract,
