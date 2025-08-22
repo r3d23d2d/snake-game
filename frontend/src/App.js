@@ -156,7 +156,7 @@ function App() {
       const link = document.createElement('a');
       link.href = url;
       // Filename will be set by backend Content-Disposition header
-      link.download = `Договор для ${currentContract.client_name} (редактированный).docx`;
+      link.download = `Договор для ${currentContract.client_name}.docx`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
