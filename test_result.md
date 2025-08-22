@@ -348,11 +348,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Fix contract end date calculation to include year"
-    - "Add Kazan and contract signing date to Word document header"
-    - "Move section 11 to new page and compact executor details"
-    - "Update frontend to display correct contract end year"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
