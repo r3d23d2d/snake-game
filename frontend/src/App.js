@@ -170,7 +170,7 @@ function App() {
       console.error('Error downloading custom contract:', error);
       toast({
         title: "Ошибка",
-        description: "Не удалось скачать редактированный договор",
+        description: "Не удалось скачать договор",
         variant: "destructive",
       });
     }
