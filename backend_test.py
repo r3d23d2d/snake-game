@@ -179,6 +179,7 @@ class DirectContractTester:
                 self.created_contract_ids.append(response['id'])
                 end_date = response.get('contract_end_date', '')
                 end_month = response.get('contract_end_month', '')
+                end_year = response.get('contract_end_year', '')
                 
                 # Check if end_date is a valid day (1-31)
                 try:
@@ -197,6 +198,36 @@ class DirectContractTester:
                     print(f"   ✅ Valid Russian month: {end_month}")
                 else:
                     print(f"   ❌ Invalid month: {end_month}")
+                    all_passed = False
+                
+                # CRITICAL: Check if end_year is present and valid
+                if end_year:
+                    try:
+                        year = int(end_year)
+                        current_year = datetime.now().year
+                        if current_year <= year <= current_year + 2:  # Allow up to 2 years in future
+                            print(f"   ✅ Valid end year: {end_year}")
+                            
+                            # SPECIFIC TEST: For 6 months duration, verify year calculation
+                            if duration == 6:
+                                current_month = datetime.now().month
+                                expected_year = current_year
+                                if current_month + 6 > 12:
+                                    expected_year = current_year + 1
+                                
+                                if year == expected_year:
+                                    print(f"   ✅ Correct year calculation for 6 months: {year}")
+                                else:
+                                    print(f"   ❌ Wrong year calculation for 6 months: got {year}, expected {expected_year}")
+                                    all_passed = False
+                        else:
+                            print(f"   ❌ Invalid end year: {end_year}")
+                            all_passed = False
+                    except:
+                        print(f"   ❌ Invalid end year format: {end_year}")
+                        all_passed = False
+                else:
+                    print(f"   ❌ Missing contract_end_year field")
                     all_passed = False
             else:
                 all_passed = False
