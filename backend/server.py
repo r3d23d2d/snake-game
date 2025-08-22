@@ -887,14 +887,18 @@ async def download_contract_direct_word(contract_id: str):
     for cyrillic, latin in cyrillic_to_latin.items():
         safe_client_name = safe_client_name.replace(cyrillic, latin)
     
-    # Remove any remaining non-ASCII characters
-    safe_client_name = ''.join(c for c in safe_client_name if ord(c) < 128)
+    # Remove any remaining non-ASCII characters and special characters
+    safe_client_name = ''.join(c for c in safe_client_name if c.isalnum() or c in ['_', '-'])
     
     # Ensure filename is not empty
     if not safe_client_name:
         safe_client_name = "Contract"
     
-    filename = f"Dogovor_{safe_client_name}_{contract_obj.contract_number.replace('.', '_')}.docx"
+    # Create safe contract number for filename
+    safe_contract_number = contract_obj.contract_number.replace('.', '_').replace(' ', '_')
+    safe_contract_number = ''.join(c for c in safe_contract_number if c.isalnum() or c in ['_', '-'])
+    
+    filename = f"Dogovor_{safe_client_name}_{safe_contract_number}.docx"
     
     return StreamingResponse(
         io.BytesIO(doc_buffer.read()),
