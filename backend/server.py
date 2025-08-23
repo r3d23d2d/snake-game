@@ -468,8 +468,13 @@ def create_word_contract_with_custom_content(contract_data, custom_content=None)
         title_added = False
         signatures_section_found = False
         
+        # Track consecutive empty lines to avoid excessive spacing
+        consecutive_empty_lines = 0
+        
         for i, line in enumerate(content_lines):
             if line.strip():
+                consecutive_empty_lines = 0  # Reset counter
+                
                 # Check if this line is the title (contains contract number)
                 if ('Договор об оказании услуг №' in line and contract_data['contract_number'] in line) or \
                    (line.startswith('**Договор об оказании услуг №') and line.endswith('**')):
@@ -539,7 +544,7 @@ def create_word_contract_with_custom_content(contract_data, custom_content=None)
                 
                 # Check if line looks like a section header (all caps or bold formatting)
                 elif line.strip().isupper() or (line.startswith('**') and line.endswith('**')):
-                    # Format as section header
+                    # Format as section header with compact spacing
                     para = doc.add_paragraph()
                     # Remove markdown bold markers if present
                     clean_line = line.replace('**', '').strip()
@@ -548,16 +553,28 @@ def create_word_contract_with_custom_content(contract_data, custom_content=None)
                     run.font.size = Pt(11)
                     run.bold = True
                     para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    # Make spacing more compact for section headers
+                    para.space_before = Pt(6)
+                    para.space_after = Pt(3)
                 else:
-                    # Format as regular content
+                    # Format as regular content with compact spacing
                     para = doc.add_paragraph()
                     run = para.add_run(line.strip())
                     run.font.name = 'Times New Roman'
                     run.font.size = Pt(11)
                     para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                    # Make spacing more compact for regular paragraphs
+                    para.space_before = Pt(0)
+                    para.space_after = Pt(3)
             else:
-                # Add empty paragraph for spacing
-                doc.add_paragraph()
+                # Handle empty lines more efficiently
+                consecutive_empty_lines += 1
+                # Only add one empty paragraph for multiple consecutive empty lines
+                if consecutive_empty_lines == 1:
+                    empty_para = doc.add_paragraph()
+                    # Make empty paragraphs very compact
+                    empty_para.space_before = Pt(0)
+                    empty_para.space_after = Pt(3)
         
         # If signatures section wasn't found in content, add it manually
         if not signatures_section_found:
