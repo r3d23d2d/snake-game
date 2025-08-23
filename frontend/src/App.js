@@ -129,6 +129,8 @@ function App() {
       
       setCurrentContract(response.data);
       setIsEditingContent(false);
+      setIsContentEdited(true); // Mark as edited
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error('Error updating contract content:', error);
       toast({
