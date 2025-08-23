@@ -1164,7 +1164,7 @@ Email: test@example.com
         print("\n🔍 CRITICAL REGRESSION TEST: DOCUMENT STRUCTURE PRESERVATION")
         print("=" * 80)
         
-        # Step 1: Create a contract for testing
+        # Step 1: Create a contract for testing with individual name (for genitive case test)
         print("\n📝 Step 1: Creating contract for structure preservation test...")
         contract_data = {
             "name_or_organization": "Петров Петр Петрович",
@@ -1349,25 +1349,36 @@ Email: test@example.com
             print("\n📄 Step 5: Verifying filename handling...")
             content_disposition = custom_download_response.headers.get('Content-Disposition', '')
             
-            # Check genitive case conversion
-            if 'Петрова Петра Петровича' in content_disposition:
-                print("   ✅ Genitive case conversion in filename")
+            # Decode the URL-encoded filename
+            import urllib.parse
+            if 'filename*=UTF-8' in content_disposition:
+                # Extract the encoded filename part
+                filename_encoded = content_disposition.split("filename*=UTF-8''")[1]
+                decoded_filename = urllib.parse.unquote(filename_encoded)
+                print(f"   📄 Decoded filename: {decoded_filename}")
+                
+                # Check genitive case conversion (Петров → Петрова, Петр → Петра, Петрович → Петровича)
+                if 'Петрова Петра Петровича' in decoded_filename:
+                    print("   ✅ Genitive case conversion in filename")
+                else:
+                    print("   ❌ Genitive case conversion NOT found in filename")
+                    structure_checks_passed = False
+                
+                # Check "(редактированный)" suffix
+                if '(редактированный)' in decoded_filename:
+                    print("   ✅ '(редактированный)' suffix in filename")
+                else:
+                    print("   ❌ '(редактированный)' suffix NOT found in filename")
+                    structure_checks_passed = False
+                
+                # Check UTF-8 encoding for Cyrillic
+                if 'UTF-8' in content_disposition:
+                    print("   ✅ UTF-8 encoding specified for Cyrillic characters")
+                else:
+                    print("   ⚠️  UTF-8 encoding not explicitly specified")
             else:
-                print("   ❌ Genitive case conversion NOT found in filename")
+                print("   ❌ UTF-8 filename encoding not found in Content-Disposition")
                 structure_checks_passed = False
-            
-            # Check "(редактированный)" suffix
-            if 'редактированный' in content_disposition:
-                print("   ✅ '(редактированный)' suffix in filename")
-            else:
-                print("   ❌ '(редактированный)' suffix NOT found in filename")
-                structure_checks_passed = False
-            
-            # Check UTF-8 encoding for Cyrillic
-            if 'UTF-8' in content_disposition:
-                print("   ✅ UTF-8 encoding specified for Cyrillic characters")
-            else:
-                print("   ⚠️  UTF-8 encoding not explicitly specified")
             
             # Clean up temp file
             import os
