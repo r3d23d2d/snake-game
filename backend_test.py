@@ -2304,6 +2304,7 @@ ________________/ООО Тест Оптимизация Страниц"""
         print("="*80)
         
         tests = [
+            ("Contract Section 11 Markdown Format", self.test_contract_section_11_markdown_format),
             ("Page Layout Optimization", self.test_page_layout_optimization),
             ("Signatures Section HTML Tag Removal", self.test_signatures_section_html_tag_removal),
             ("Document Structure Preservation", self.test_document_structure_preservation),
