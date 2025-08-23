@@ -9,7 +9,7 @@ from datetime import datetime
 class RegressionTester:
     """Test specific regression fixes for contract management system"""
     
-    def __init__(self, base_url="https://contract-editor.preview.emergentagent.com"):
+    def __init__(self, base_url="https://wordsmith-app-1.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0

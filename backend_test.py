@@ -6,7 +6,7 @@ from datetime import datetime
 class DirectContractTester:
     """Test the new direct contract creation functionality"""
     
-    def __init__(self, base_url="https://contract-editor.preview.emergentagent.com"):
+    def __init__(self, base_url="https://wordsmith-app-1.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
@@ -2353,7 +2353,7 @@ ________________/ООО Тест Оптимизация Страниц"""
         self.created_contract_ids = []
 
 class ContractSystemTester:
-    def __init__(self, base_url="https://contract-editor.preview.emergentagent.com"):
+    def __init__(self, base_url="https://wordsmith-app-1.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tests_run = 0
