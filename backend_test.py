@@ -1145,6 +1145,255 @@ Email: test@example.com
         print("   ✅ All ContractContentUpdate model validation tests passed")
         return True
 
+    def test_document_structure_preservation(self):
+        """
+        CRITICAL REGRESSION TEST FOR DOCUMENT STRUCTURE PRESERVATION
+        
+        This test specifically addresses the user-reported regression:
+        "After editing document, downloaded contract changes text structure, font sizes, etc. 
+        The document should remain exactly the same in formatting. The current downloadCustomContract approach loses document structure."
+        
+        Test workflow:
+        1. Create contract → Edit content → Download with custom content
+        2. Verify document structure preservation (Times New Roman 11pt, headers, structure)
+        3. Verify title format "Договор об оказании услуг № [number]"
+        4. Verify Kazan/date header is preserved
+        5. Verify content integration with proper formatting
+        6. Verify filename handling with genitive case and "(редактированный)" suffix
+        """
+        print("\n🔍 CRITICAL REGRESSION TEST: DOCUMENT STRUCTURE PRESERVATION")
+        print("=" * 80)
+        
+        # Step 1: Create a contract for testing
+        print("\n📝 Step 1: Creating contract for structure preservation test...")
+        contract_data = {
+            "name_or_organization": "Петров Петр Петрович",
+            "other_details": "Адрес: г. Казань, ул. Структурная, 1\nИНН: 1234567890\nТел: +7(843)555-01-23",
+            "service_cost": 75000,
+            "duration_months": 6
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Structure Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            print("❌ Failed to create contract for structure test")
+            return False
+        
+        contract_id = response['id']
+        contract_number = response['contract_number']
+        self.created_contract_ids.append(contract_id)
+        
+        print(f"✅ Contract created: {contract_id}")
+        print(f"   Contract number: {contract_number}")
+        
+        # Step 2: Edit contract content with structured formatting
+        print("\n✏️  Step 2: Editing contract with structured content...")
+        edited_content = f"""**Договор об оказании услуг № {contract_number}**
+
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и Петров Петр Петрович, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. «Исполнитель» принимает на себя обязательства оказать комплекс услуг в соответствии с заявками «Заказчика», а «Заказчик» обязуется принять услуги и оплатить их в размере и порядке, установленном настоящим договором.
+
+1.2. ОТРЕДАКТИРОВАННЫЙ ПУНКТ: В комплекс оказываемых услуг входят специализированные услуги по созданию рекламных кампаний.
+
+**2. СРОК ДЕЙСТВИЯ ДОГОВОРА**
+
+2.1. Настоящий Договор вступает в силу с даты его подписания Сторонами и действует до окончания установленного срока.
+
+2.2. НОВЫЙ ПУНКТ: Договор может быть продлен по взаимному согласию сторон.
+
+**3. ЦЕНА УСЛУГ И ПОРЯДОК РАСЧЕТОВ**
+
+3.1 Стоимость услуг составляет 75000 (семьдесят пять тысяч) рублей в месяц.
+
+3.2 ИЗМЕНЕННЫЕ УСЛОВИЯ ОПЛАТЫ: Оплата производится в соответствии с выставленными счетами.
+
+**4. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ**
+
+4.1. Настоящий Договор составлен в двух экземплярах, по одному экземпляру для каждой из Сторон.
+
+4.2. ПРОВЕРКА СТРУКТУРЫ: Данный текст должен сохранить правильное форматирование в Word документе.
+
+**ПОДПИСИ СТОРОН**
+
+Исполнитель: ________________/Шамсутдинов Р.Р.
+
+Заказчик: ________________/Петров Петр Петрович
+
+КОНЕЦ СТРУКТУРИРОВАННОГО СОДЕРЖИМОГО"""
+
+        content_update = {"contract_content": edited_content}
+        
+        success, edit_response = self.run_test(
+            "Edit Contract Content with Structure",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=content_update,
+            return_response=True
+        )
+        
+        if not success:
+            print("❌ Failed to edit contract content")
+            return False
+        
+        print("✅ Contract content edited successfully")
+        
+        # Step 3: Download with custom content (should preserve structure)
+        print("\n📥 Step 3: Testing custom download with structure preservation...")
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download_custom"
+        
+        self.tests_run += 1
+        try:
+            custom_download_response = requests.get(url)
+            if custom_download_response.status_code != 200:
+                print(f"❌ Custom download failed: {custom_download_response.status_code}")
+                return False
+            
+            self.tests_passed += 1
+            print("✅ Custom download successful")
+            
+            # Step 4: Verify document structure preservation
+            print("\n🔍 Step 4: Verifying document structure preservation...")
+            
+            import tempfile
+            import zipfile
+            from xml.etree import ElementTree as ET
+            
+            with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                temp_file.write(custom_download_response.content)
+                temp_file_path = temp_file.name
+            
+            structure_checks_passed = True
+            
+            with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                # Check document.xml for structure
+                document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                
+                # Parse XML to check structure
+                root = ET.fromstring(document_xml)
+                
+                # Check 1: Title format "Договор об оказании услуг № [number]"
+                title_found = f"Договор об оказании услуг № {contract_number}" in document_xml
+                if title_found:
+                    print("   ✅ Title format preserved: 'Договор об оказании услуг № [number]'")
+                else:
+                    print("   ❌ Title format NOT preserved")
+                    structure_checks_passed = False
+                
+                # Check 2: Kazan/date header preservation
+                kazan_found = 'Казань' in document_xml
+                if kazan_found:
+                    print("   ✅ Kazan header preserved")
+                else:
+                    print("   ❌ Kazan header NOT preserved")
+                    structure_checks_passed = False
+                
+                # Check 3: Font formatting (Times New Roman references)
+                # Look for font family specifications in styles.xml
+                try:
+                    styles_xml = docx_zip.read('word/styles.xml').decode('utf-8')
+                    times_new_roman_found = 'Times New Roman' in styles_xml
+                    if times_new_roman_found:
+                        print("   ✅ Times New Roman font references found in styles")
+                    else:
+                        print("   ⚠️  Times New Roman font references not found in styles (may use default)")
+                except:
+                    print("   ⚠️  Could not check styles.xml for font references")
+                
+                # Check 4: Section headers formatting (bold text)
+                bold_sections = document_xml.count('<w:b/>') + document_xml.count('<w:b ')
+                if bold_sections > 5:  # Should have multiple bold sections
+                    print(f"   ✅ Section headers appear to be bold formatted ({bold_sections} bold elements)")
+                else:
+                    print(f"   ❌ Insufficient bold formatting for section headers ({bold_sections} bold elements)")
+                    structure_checks_passed = False
+                
+                # Check 5: Paragraph structure preservation
+                paragraph_count = document_xml.count('<w:p>')
+                if paragraph_count > 10:  # Should have multiple paragraphs
+                    print(f"   ✅ Document structure preserved ({paragraph_count} paragraphs)")
+                else:
+                    print(f"   ❌ Document structure may be flattened ({paragraph_count} paragraphs)")
+                    structure_checks_passed = False
+                
+                # Check 6: Content integration - edited content should be present
+                content_checks = [
+                    ('Edited clause', 'ОТРЕДАКТИРОВАННЫЙ ПУНКТ' in document_xml),
+                    ('New clause', 'НОВЫЙ ПУНКТ' in document_xml),
+                    ('Changed conditions', 'ИЗМЕНЕННЫЕ УСЛОВИЯ ОПЛАТЫ' in document_xml),
+                    ('Structure verification', 'ПРОВЕРКА СТРУКТУРЫ' in document_xml),
+                    ('Client name', 'Петров Петр Петрович' in document_xml),
+                    ('Service cost', '75000' in document_xml)
+                ]
+                
+                for check_name, check_result in content_checks:
+                    if check_result:
+                        print(f"   ✅ {check_name} found in document")
+                    else:
+                        print(f"   ❌ {check_name} NOT found in document")
+                        structure_checks_passed = False
+            
+            # Step 5: Verify filename handling
+            print("\n📄 Step 5: Verifying filename handling...")
+            content_disposition = custom_download_response.headers.get('Content-Disposition', '')
+            
+            # Check genitive case conversion
+            if 'Петрова Петра Петровича' in content_disposition:
+                print("   ✅ Genitive case conversion in filename")
+            else:
+                print("   ❌ Genitive case conversion NOT found in filename")
+                structure_checks_passed = False
+            
+            # Check "(редактированный)" suffix
+            if 'редактированный' in content_disposition:
+                print("   ✅ '(редактированный)' suffix in filename")
+            else:
+                print("   ❌ '(редактированный)' suffix NOT found in filename")
+                structure_checks_passed = False
+            
+            # Check UTF-8 encoding for Cyrillic
+            if 'UTF-8' in content_disposition:
+                print("   ✅ UTF-8 encoding specified for Cyrillic characters")
+            else:
+                print("   ⚠️  UTF-8 encoding not explicitly specified")
+            
+            # Clean up temp file
+            import os
+            try:
+                os.unlink(temp_file_path)
+            except:
+                pass
+            
+            if structure_checks_passed:
+                print("\n🎉 DOCUMENT STRUCTURE PRESERVATION TEST PASSED!")
+                print("✅ All critical structure elements verified:")
+                print("   • Title format preserved")
+                print("   • Kazan/date header preserved") 
+                print("   • Section formatting maintained")
+                print("   • Content properly integrated")
+                print("   • Filename handling correct")
+                return True
+            else:
+                print("\n❌ DOCUMENT STRUCTURE PRESERVATION TEST FAILED!")
+                print("   Some structure elements were not preserved correctly")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error during structure preservation test: {str(e)}")
+            return False
+
     def test_contract_content_editing_workflow(self):
         """
         COMPREHENSIVE TEST FOR CONTRACT CONTENT EDITING AND DOWNLOAD FUNCTIONALITY
