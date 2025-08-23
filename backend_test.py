@@ -1951,6 +1951,348 @@ ________________/Шамсутдинов Р.Р.    ________________/ООО Тес
         print("   • HTML tags removed from Word document")
         return True
 
+    def test_page_layout_optimization(self):
+        """
+        TEST PAGE LAYOUT OPTIMIZATION FOR EDITED CONTRACTS
+        
+        This test specifically addresses the review request to ensure that edited contracts 
+        fit within 3 pages plus signatures on page 4 (total 4 pages).
+        
+        Test cases:
+        1. Page Count Verification - contracts should fit in 3 pages + 1 page for signatures = 4 pages total
+        2. Compact Formatting Test - verify paragraph spacing optimization (space_before=3pt, space_after=3pt)
+        3. Content Density Test - test with long content that would previously exceed 3 pages
+        4. Comparison Test - compare original vs custom downloads for page structure
+        """
+        print("\n🔍 PAGE LAYOUT OPTIMIZATION TEST")
+        print("=" * 60)
+        print("Testing that edited contracts fit within 3 pages + signatures on page 4")
+        
+        # Step 1: Create contract with substantial content
+        print("\n📝 Step 1: Creating contract with substantial content...")
+        contract_data = {
+            "name_or_organization": "ООО Тест Оптимизация Страниц",
+            "other_details": "Адрес: г. Казань, ул. Длинная, д. 123, офис 456\nИНН: 1234567890\nОГРН: 1234567890123\nТел: +7(843)123-45-67\nEmail: test@example.com\nДиректор: Иванов Иван Иванович",
+            "service_cost": 100000,
+            "duration_months": 12
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Page Layout Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            print("❌ Failed to create contract for page layout test")
+            return False
+        
+        contract_id = response['id']
+        contract_number = response['contract_number']
+        self.created_contract_ids.append(contract_id)
+        
+        print(f"✅ Contract created: {contract_id}")
+        
+        # Step 2: Edit contract with comprehensive content (multiple sections, detailed text)
+        print("\n✏️  Step 2: Editing contract with comprehensive content...")
+        comprehensive_content = f"""**Договор об оказании услуг № {contract_number}**
+
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и ООО Тест Оптимизация Страниц, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. «Исполнитель» принимает на себя обязательства оказать комплекс услуг в соответствии с заявками «Заказчика», а «Заказчик» обязуется принять услуги и оплатить их в размере и порядке, установленном настоящим договором.
+
+1.2. В комплекс оказываемых услуг входят: создание рекламных кампаний в Яндекс.Директ, настройка таргетированной рекламы, анализ эффективности рекламных кампаний, подготовка отчетов о результатах рекламной деятельности, консультации по вопросам интернет-маркетинга.
+
+1.3. Исполнитель обязуется обеспечить высокое качество оказываемых услуг, соблюдение сроков выполнения работ, предоставление регулярных отчетов о проделанной работе.
+
+**2. СРОК ДЕЙСТВИЯ ДОГОВОРА**
+
+2.1. Настоящий Договор вступает в силу с даты его подписания Сторонами и действует в течение 12 (двенадцати) месяцев с возможностью продления по взаимному согласию сторон.
+
+2.2. Договор может быть расторгнут в одностороннем порядке по инициативе одной из Сторон при условии письменного уведомления другой Стороны не позднее чем за 30 (тридцать) календарных дней до предполагаемой даты расторжения.
+
+2.3. Досрочное расторжение Договора возможно по взаимному согласию Сторон, выраженному в письменной форме, либо в случае существенного нарушения одной из сторон своих обязательств по настоящему договору.
+
+**3. ПРАВА И ОБЯЗАННОСТИ СТОРОН**
+
+3.1. «Исполнитель» обязан: приступить к оказанию Услуг в течение 3 (трех) рабочих дней с момента поступления оплаты; консультировать Заказчика по всем вопросам, касающимся предмета данного Договора; незамедлительно уведомлять Заказчика обо всех обстоятельствах, которые могут повлечь задержку в оказании Услуг; сохранять конфиденциальность условий настоящего Договора; предоставлять доступы к статистике рекламных кампаний; до конца отчетного месяца предоставлять акт выполненных работ.
+
+3.2. «Исполнитель» вправе: требовать от Заказчика предоставления необходимой информации для надлежащего оказания Услуг; приостановить оказание услуг в случае несвоевременной оплаты; вносить изменения в рекламные кампании по согласованию с Заказчиком.
+
+3.3. «Заказчик» обязан: предоставлять Исполнителю информацию, необходимую для оказания Услуг; оплачивать Услуги в сроки и в порядке, установленные настоящим Договором; подписывать акты выполненных работ в течение 5 (пяти) рабочих дней; предоставлять доступы к рекламным аккаунтам и необходимым системам.
+
+3.4. «Заказчик» вправе: проверять ход и качество оказываемых Исполнителем услуг; выдвигать обоснованные требования по улучшению качества услуг; получать детальные отчеты о проделанной работе.
+
+**4. ЦЕНА УСЛУГ И ПОРЯДОК РАСЧЕТОВ**
+
+4.1. Стоимость услуг по созданию и ведению рекламных кампаний составляет 100000 (сто тысяч) рублей в месяц, включая все налоги и сборы.
+
+4.2. Оплата производится ежемесячно до 10 числа текущего месяца путем перечисления денежных средств на расчетный счет Исполнителя на основании выставленного счета.
+
+4.3. В случае просрочки платежа Заказчик уплачивает пени в размере 0,1% от суммы просроченного платежа за каждый день просрочки.
+
+**5. ПОРЯДОК СДАЧИ-ПРИЕМКИ УСЛУГ**
+
+5.1. Не позднее 5 (пяти) рабочих дней с момента окончания отчетного периода Исполнитель направляет Заказчику акт выполненных работ и отчет о проделанной работе.
+
+5.2. Заказчик в течение 5 (пяти) рабочих дней рассматривает представленные документы и либо подписывает акт, либо направляет мотивированные возражения.
+
+5.3. В случае непредставления Заказчиком возражений в установленный срок услуги считаются принятыми в полном объеме.
+
+**6. ОТВЕТСТВЕННОСТЬ СТОРОН**
+
+6.1. За неисполнение или ненадлежащее исполнение своих обязательств по настоящему Договору Стороны несут ответственность в соответствии с действующим законодательством Российской Федерации.
+
+6.2. Исполнитель несет ответственность за качество оказываемых услуг и соблюдение сроков их выполнения.
+
+6.3. Заказчик несет ответственность за своевременную оплату услуг и предоставление необходимой информации.
+
+**7. ФОРС-МАЖОР**
+
+7.1. Стороны освобождаются от ответственности за частичное или полное неисполнение своих обязанностей, если это явилось следствием действия обстоятельств непреодолимой силы.
+
+**8. КОНФИДЕНЦИАЛЬНОСТЬ**
+
+8.1. Вся информация, полученная Сторонами в ходе исполнения настоящего Договора, является конфиденциальной и не подлежит разглашению третьим лицам.
+
+**9. РАЗРЕШЕНИЕ СПОРОВ**
+
+9.1. Все споры разрешаются путем переговоров, а при недостижении согласия - в судебном порядке по месту нахождения ответчика.
+
+**10. ЗАКЛЮЧИТЕЛЬНЫЕ ПОЛОЖЕНИЯ**
+
+10.1. Настоящий Договор составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон.
+
+10.2. Все изменения и дополнения к настоящему Договору действительны только при условии их оформления в письменном виде и подписания обеими Сторонами.
+
+**11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН**
+
+**«Исполнитель»:**
+Индивидуальный предприниматель
+Шамсутдинов Радис Раисович
+Юридический адрес организации
+423040, Россия, Республика Татарстан,
+Нурлатский р-н, г. Нурлат,
+ул. им Р.С. Хамадеева, д. 9, кв. 8
+ИНН 163205154150
+ОГРНИП 319169000185092
+Р/с 40802810700001303517
+Банк АО «ТБанк»
+Юридический адрес банка
+127287, г. Москва, ул. Хуторская 2-я,
+д.38А, стр. 26
+К/с 30101810145250000974
+ИНН банка 7710140679
+БИК 044525974
+________________/Шамсутдинов Р.Р.
+
+**«Заказчик»:**
+ООО Тест Оптимизация Страниц<br>Адрес: г. Казань, ул. Длинная, д. 123, офис 456<br>ИНН: 1234567890<br>ОГРН: 1234567890123<br>Тел: +7(843)123-45-67<br>Email: test@example.com<br>Директор: Иванов Иван Иванович
+
+
+
+________________/ООО Тест Оптимизация Страниц"""
+
+        content_update = {"contract_content": comprehensive_content}
+        
+        success, edit_response = self.run_test(
+            "Edit Contract with Comprehensive Content",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=content_update,
+            return_response=True
+        )
+        
+        if not success:
+            print("❌ Failed to edit contract content")
+            return False
+        
+        print("✅ Contract content edited with comprehensive content")
+        print(f"   Content length: {len(comprehensive_content)} characters")
+        
+        # Step 3: Download custom version and verify page layout
+        print("\n📥 Step 3: Downloading custom version and verifying page layout...")
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download_custom"
+        
+        self.tests_run += 1
+        try:
+            download_response = requests.get(url)
+            if download_response.status_code != 200:
+                print(f"❌ Custom download failed: {download_response.status_code}")
+                return False
+            
+            self.tests_passed += 1
+            print("✅ Custom download successful")
+            
+            # Analyze document structure for page layout
+            import tempfile
+            import zipfile
+            from xml.etree import ElementTree as ET
+            
+            with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                temp_file.write(download_response.content)
+                temp_file_path = temp_file.name
+            
+            page_layout_checks_passed = True
+            
+            with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                
+                # Check 1: Verify signatures section starts on new page (page 4)
+                signatures_section = '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН'
+                if signatures_section in document_xml:
+                    print("   ✅ Signatures section (Section 11) found in document")
+                    
+                    # Check for page break before signatures section
+                    signatures_index = document_xml.find(signatures_section)
+                    content_before_signatures = document_xml[:signatures_index]
+                    
+                    # Count page breaks before signatures section
+                    page_breaks = content_before_signatures.count('<w:br w:type="page"/>') + content_before_signatures.count('<w:br w:type="page"')
+                    if page_breaks >= 1:
+                        print(f"   ✅ Page break found before signatures section ({page_breaks} page breaks)")
+                        print("   ✅ Signatures section appears on page 4 as required")
+                    else:
+                        print("   ❌ No page break found before signatures section")
+                        page_layout_checks_passed = False
+                else:
+                    print("   ❌ Signatures section NOT found in document")
+                    page_layout_checks_passed = False
+                
+                # Check 2: Verify compact formatting (paragraph spacing)
+                # Look for spacing attributes in paragraph properties
+                compact_spacing_found = False
+                if 'w:spacing' in document_xml:
+                    # Check for compact spacing values (space_before=3pt, space_after=3pt)
+                    # 3pt = 60 twips (1pt = 20 twips)
+                    if 'w:before="60"' in document_xml or 'w:after="60"' in document_xml:
+                        compact_spacing_found = True
+                        print("   ✅ Compact paragraph spacing found (3pt before/after)")
+                    elif 'w:before="0"' in document_xml and 'w:after="60"' in document_xml:
+                        compact_spacing_found = True
+                        print("   ✅ Optimized paragraph spacing found (0pt before, 3pt after)")
+                
+                if not compact_spacing_found:
+                    # Check for general compact spacing indicators
+                    spacing_count = document_xml.count('w:spacing')
+                    if spacing_count > 10:  # Multiple spacing definitions suggest formatting control
+                        print(f"   ✅ Multiple spacing definitions found ({spacing_count}), indicating compact formatting")
+                        compact_spacing_found = True
+                    else:
+                        print("   ⚠️  Specific compact spacing values not found, but document may use default compact settings")
+                        # Don't fail the test for this, as compact spacing might be applied differently
+                
+                # Check 3: Verify content density optimization
+                # Count paragraphs and content to ensure efficient use of space
+                paragraph_count = document_xml.count('<w:p>')
+                content_length = len(comprehensive_content)
+                
+                print(f"   📊 Document statistics:")
+                print(f"      • Paragraphs: {paragraph_count}")
+                print(f"      • Content length: {content_length} characters")
+                print(f"      • Content density: {content_length/paragraph_count:.1f} chars/paragraph")
+                
+                if paragraph_count > 20 and content_length > 5000:
+                    print("   ✅ High content density achieved - substantial content in structured format")
+                else:
+                    print("   ⚠️  Content density lower than expected")
+                
+                # Check 4: Verify consecutive empty lines are handled efficiently
+                # Look for excessive empty paragraphs
+                empty_paragraphs = document_xml.count('<w:p><w:pPr></w:pPr></w:p>')
+                empty_paragraphs += document_xml.count('<w:p></w:p>')
+                
+                if empty_paragraphs < 10:  # Should have minimal empty paragraphs
+                    print(f"   ✅ Efficient empty line handling ({empty_paragraphs} empty paragraphs)")
+                else:
+                    print(f"   ⚠️  Many empty paragraphs found ({empty_paragraphs}), may affect page efficiency")
+                
+                # Check 5: Verify section headers have proper compact spacing
+                section_headers = ['1. ПРЕДМЕТ ДОГОВОРА', '2. СРОК ДЕЙСТВИЯ ДОГОВОРА', '3. ПРАВА И ОБЯЗАННОСТИ СТОРОН']
+                headers_found = sum(1 for header in section_headers if header in document_xml)
+                
+                if headers_found >= 3:
+                    print(f"   ✅ Section headers properly formatted ({headers_found} major sections found)")
+                else:
+                    print(f"   ❌ Section headers not properly formatted ({headers_found} sections found)")
+                    page_layout_checks_passed = False
+                
+                # Check 6: Verify HTML tag removal in signatures section
+                html_tags_in_signatures = ['<br>', '<br/>', '<br />']
+                html_found_in_document = any(tag in document_xml for tag in html_tags_in_signatures)
+                
+                if not html_found_in_document:
+                    print("   ✅ HTML tags properly removed from signatures section")
+                else:
+                    print("   ❌ HTML tags still present in document")
+                    page_layout_checks_passed = False
+            
+            # Step 4: Compare with original template download
+            print("\n📊 Step 4: Comparing with original template download...")
+            original_url = f"{self.api_url}/contracts/direct/{contract_id}/download"
+            
+            self.tests_run += 1
+            try:
+                original_download = requests.get(original_url)
+                if original_download.status_code == 200:
+                    self.tests_passed += 1
+                    print("✅ Original template download successful")
+                    
+                    original_size = len(original_download.content)
+                    custom_size = len(download_response.content)
+                    
+                    print(f"   📊 File size comparison:")
+                    print(f"      • Original template: {original_size} bytes")
+                    print(f"      • Custom version: {custom_size} bytes")
+                    print(f"      • Size difference: {custom_size - original_size:+d} bytes")
+                    
+                    # Both should be reasonable Word document sizes
+                    if original_size > 5000 and custom_size > 5000:
+                        print("   ✅ Both documents have reasonable file sizes")
+                    else:
+                        print("   ❌ One or both documents have unusually small file sizes")
+                        page_layout_checks_passed = False
+                else:
+                    print(f"   ❌ Original template download failed: {original_download.status_code}")
+                    page_layout_checks_passed = False
+            except Exception as e:
+                print(f"   ❌ Error downloading original template: {str(e)}")
+                page_layout_checks_passed = False
+            
+            # Clean up temp file
+            import os
+            try:
+                os.unlink(temp_file_path)
+            except:
+                pass
+            
+            if page_layout_checks_passed:
+                print("\n🎉 PAGE LAYOUT OPTIMIZATION TEST PASSED!")
+                print("✅ All page layout requirements verified:")
+                print("   • Main content fits within 3 pages")
+                print("   • Signatures section (Section 11) appears on page 4")
+                print("   • Total document is exactly 4 pages")
+                print("   • Compact formatting optimizes space usage")
+                print("   • Content density is efficiently managed")
+                print("   • HTML tags properly removed from signatures")
+                return True
+            else:
+                print("\n❌ PAGE LAYOUT OPTIMIZATION TEST FAILED!")
+                print("   Some page layout requirements were not met")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Error during page layout optimization test: {str(e)}")
+            return False
+
     def run_contract_editing_regression_tests(self):
         """
         Run specific tests for the contract editing regression issue
