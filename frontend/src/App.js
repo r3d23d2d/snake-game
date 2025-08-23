@@ -348,7 +348,7 @@ function App() {
                       <Textarea
                         value={editedContent}
                         onChange={(e) => setEditedContent(e.target.value)}
-                        className="border-slate-200 focus:border-purple-500 resize-none min-h-[400px] font-mono text-sm"
+                        className="border-slate-200 focus:border-purple-500 resize-none min-h-[600px] font-mono text-sm"
                         placeholder="Введите текст договора..."
                       />
                     </div>
