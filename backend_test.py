@@ -916,7 +916,7 @@ class DirectContractTester:
                 
                 # Check Content-Disposition header for filename
                 content_disposition = download_response.headers.get('Content-Disposition', '')
-                if 'attachment' in content_disposition and 'filename=' in content_disposition:
+                if 'attachment' in content_disposition and ('filename=' in content_disposition or 'filename*=' in content_disposition):
                     print("   ✅ Correct Content-Disposition header with filename")
                     
                     # Decode the URL-encoded filename
