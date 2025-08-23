@@ -436,6 +436,107 @@ def create_word_contract_with_custom_content(contract_data, custom_content=None)
     style.font.name = 'Times New Roman'
     style.font.size = Pt(11)
     
+    # If custom content is provided, use it; otherwise use default template structure
+    if custom_content:
+        # Parse and format custom content with proper font settings
+        content_lines = custom_content.split('\n')
+        title_added = False
+        
+        for line in content_lines:
+            if line.strip():
+                # Check if this line is the title (contains contract number)
+                if ('Договор об оказании услуг №' in line and contract_data['contract_number'] in line) or \
+                   (line.startswith('**Договор об оказании услуг №') and line.endswith('**')):
+                    if not title_added:
+                        # Add title (first element, larger font)
+                        title_para = doc.add_paragraph()
+                        title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                        # Remove markdown bold markers if present
+                        clean_line = line.replace('**', '').strip()
+                        title_run = title_para.add_run(clean_line)
+                        title_run.bold = True
+                        title_run.font.name = 'Times New Roman'
+                        title_run.font.size = Pt(14)  # Larger font size
+                        title_added = True
+                    continue
+                
+                # Check if this is the city/date line
+                if line.strip().startswith('г. Казань') and '2025 г.' in line:
+                    # Add header with Kazan (left) and contract signing date (right)
+                    header_para = doc.add_paragraph()
+                    header_para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+                    
+                    # Add "Казань" on the left
+                    left_run = header_para.add_run("Казань")
+                    left_run.font.name = 'Times New Roman'
+                    left_run.font.size = Pt(11)
+                    
+                    # Add spaces to push the date to the right
+                    spacer_run = header_para.add_run("\t" * 10)  # Use tabs for alignment
+                    
+                    # Add current date on the right (Moscow time)
+                    moscow_tz = timezone(timedelta(hours=3))
+                    current_date = datetime.now(moscow_tz)
+                    date_str = f'«{current_date.day}» {current_date.strftime("%B")} {current_date.year} г.'
+                    # Replace English month names with Russian
+                    months_map = {
+                        'January': 'января', 'February': 'февраля', 'March': 'марта', 'April': 'апреля',
+                        'May': 'мая', 'June': 'июня', 'July': 'июля', 'August': 'августа',
+                        'September': 'сентября', 'October': 'октября', 'November': 'ноября', 'December': 'декабря'
+                    }
+                    for eng_month, ru_month in months_map.items():
+                        date_str = date_str.replace(eng_month, ru_month)
+                    
+                    right_run = header_para.add_run(date_str)
+                    right_run.font.name = 'Times New Roman'
+                    right_run.font.size = Pt(11)
+                    continue
+                
+                # Check if line looks like a section header (all caps or bold formatting)
+                if line.strip().isupper() or (line.startswith('**') and line.endswith('**')):
+                    # Format as section header
+                    para = doc.add_paragraph()
+                    # Remove markdown bold markers if present
+                    clean_line = line.replace('**', '').strip()
+                    run = para.add_run(clean_line)
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(11)
+                    run.bold = True
+                    para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                else:
+                    # Format as regular content
+                    para = doc.add_paragraph()
+                    run = para.add_run(line.strip())
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(11)
+                    para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            else:
+                # Add empty paragraph for spacing
+                doc.add_paragraph()
+        
+        # Add page break before adding signatures section for edited content
+        doc.add_page_break()
+        
+        # Add signatures section for edited content
+        add_signatures_section(doc, contract_data)
+        
+    else:
+        # Add standard title and header for default content
+        add_title_and_header(doc, contract_data)
+        
+        # Use the original structured content creation (existing logic)
+        # Contract parties
+        add_formatted_paragraph(doc, 
+            f'Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {contract_data["client_name"]}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:', 
+            alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
+        
+        # Continue with rest of structured content...
+        create_default_contract_content(doc, contract_data)
+    
+    return doc
+
+def add_title_and_header(doc, contract_data):
+    """Add title and header to document"""
     # Title (first element, larger font)
     title_para = doc.add_paragraph()
     title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -475,46 +576,103 @@ def create_word_contract_with_custom_content(contract_data, custom_content=None)
     
     # Empty line after header
     doc.add_paragraph()
+
+def add_signatures_section(doc, contract_data):
+    """Add signatures section with proper formatting"""
+    # Section 11 - Details and signatures table (on new page)
+    add_formatted_paragraph(doc, "11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН", bold=True, alignment=WD_ALIGN_PARAGRAPH.CENTER)
     
-    # If custom content is provided, use it; otherwise use default template structure
-    if custom_content:
-        # Parse and format custom content with proper font settings
-        content_lines = custom_content.split('\n')
-        for line in content_lines:
-            if line.strip():
-                # Check if line looks like a section header (all caps or bold formatting)
-                if line.strip().isupper() or line.startswith('**') and line.endswith('**'):
-                    # Format as section header
-                    para = doc.add_paragraph()
-                    # Remove markdown bold markers if present
-                    clean_line = line.replace('**', '').strip()
-                    run = para.add_run(clean_line)
-                    run.font.name = 'Times New Roman'
-                    run.font.size = Pt(11)
-                    run.bold = True
-                    para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                else:
-                    # Format as regular content
-                    para = doc.add_paragraph()
-                    run = para.add_run(line.strip())
-                    run.font.name = 'Times New Roman'
-                    run.font.size = Pt(11)
-                    para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-            else:
-                # Add empty paragraph for spacing
-                doc.add_paragraph()
-    else:
-        # Use the original structured content creation (existing logic)
-        # Contract parties
-        add_formatted_paragraph(doc, 
-            f'Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {contract_data["client_name"]}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:', 
-            alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
-        
-        # Continue with rest of structured content...
-        # (keeping original logic for when no custom content is provided)
-        create_default_contract_content(doc, contract_data)
+    # Create table for signatures with equal height
+    table = doc.add_table(rows=1, cols=2)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
     
-    return doc
+    # Set column widths
+    for column in table.columns:
+        column.width = Inches(3)
+    
+    # Executor cell
+    executor_cell = table.cell(0, 0)
+    executor_cell.paragraphs[0].clear()  # Clear existing paragraph
+    
+    exec_para = executor_cell.add_paragraph()
+    exec_run = exec_para.add_run("«Исполнитель»:")
+    exec_run.bold = True
+    exec_run.font.name = 'Times New Roman'
+    exec_run.font.size = Pt(11)
+    
+    executor_details = [
+        "Индивидуальный предприниматель",
+        "Шамсутдинов Радис Раисович",  
+        "Юридический адрес организации",
+        "423040, Россия, Республика Татарстан,",
+        "Нурлатский р-н, г. Нурлат,",
+        "ул. им Р.С. Хамадеева, д. 9, кв. 8",
+        "ИНН 163205154150",
+        "ОГРНИП 319169000185092",
+        "Р/с 40802810700001303517",
+        "Банк АО «ТБанк»",
+        "Юридический адрес банка",
+        "127287, г. Москва, ул. Хуторская 2-я,",
+        "д.38А, стр. 26",
+        "К/с 30101810145250000974",
+        "ИНН банка 7710140679",
+        "БИК 044525974"
+    ]
+    
+    for detail in executor_details:
+        exec_detail_para = executor_cell.add_paragraph()
+        exec_detail_run = exec_detail_para.add_run(detail)
+        exec_detail_run.font.name = 'Times New Roman'
+        exec_detail_run.font.size = Pt(11)
+        # Make paragraph spacing more compact
+        exec_detail_para.space_after = Pt(0)
+        exec_detail_para.space_before = Pt(0)
+    
+    # Add signature line for executor
+    exec_sig_para = executor_cell.add_paragraph()
+    exec_sig_para.add_run("")  # Empty space
+    exec_sig_para = executor_cell.add_paragraph()
+    exec_sig_run = exec_sig_para.add_run("________________/Шамсутдинов Р.Р.")
+    exec_sig_run.font.name = 'Times New Roman'
+    exec_sig_run.font.size = Pt(11)
+    
+    # Client cell  
+    client_cell = table.cell(0, 1)
+    client_cell.paragraphs[0].clear()  # Clear existing paragraph
+    
+    client_para = client_cell.add_paragraph()
+    client_run = client_para.add_run("«Заказчик»:")
+    client_run.bold = True
+    client_run.font.name = 'Times New Roman'
+    client_run.font.size = Pt(11)
+    
+    # Format client details from contract data - FIXED: Remove HTML tags
+    client_details_text = contract_data.get('client_details', contract_data['client_name'])
+    # Remove HTML tags and replace with actual line breaks
+    client_details_text = client_details_text.replace('<br>', '\n').replace('<br/>', '\n').replace('<br />', '\n')
+    client_details_lines = client_details_text.split('\n')
+    
+    for detail in client_details_lines:
+        if detail.strip():  # Only add non-empty lines
+            client_detail_para = client_cell.add_paragraph()
+            client_detail_run = client_detail_para.add_run(detail.strip())
+            client_detail_run.font.name = 'Times New Roman'
+            client_detail_run.font.size = Pt(11)
+            # Make paragraph spacing more compact
+            client_detail_para.space_after = Pt(0)
+            client_detail_para.space_before = Pt(0)
+    
+    # Add empty lines to match executor height
+    for _ in range(max(0, len(executor_details) - len([line for line in client_details_lines if line.strip()]))):
+        client_cell.add_paragraph("")
+    
+    # Add signature line for client (on same level as executor)
+    client_sig_para = client_cell.add_paragraph()
+    client_sig_para.add_run("")  # Empty space
+    client_sig_para = client_cell.add_paragraph()
+    client_sig_run = client_sig_para.add_run(f"________________/{contract_data['client_name']}")
+    client_sig_run.font.name = 'Times New Roman' 
+    client_sig_run.font.size = Pt(11)
 
 def create_default_contract_content(doc, contract_data):
     """Create the default structured contract content"""
