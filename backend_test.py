@@ -918,15 +918,22 @@ class DirectContractTester:
                 content_disposition = download_response.headers.get('Content-Disposition', '')
                 if 'attachment' in content_disposition and 'filename=' in content_disposition:
                     print("   ✅ Correct Content-Disposition header with filename")
-                    # Extract filename
-                    filename_part = content_disposition.split('filename=')[1]
-                    print(f"   📄 Filename: {filename_part}")
                     
-                    # Check if filename contains 'custom' and contract info
-                    if 'custom' in filename_part.lower() and '.docx' in filename_part:
-                        print("   ✅ Filename indicates custom document and has .docx extension")
+                    # Decode the URL-encoded filename
+                    import urllib.parse
+                    if 'filename*=UTF-8' in content_disposition:
+                        filename_encoded = content_disposition.split("filename*=UTF-8''")[1]
+                        decoded_filename = urllib.parse.unquote(filename_encoded)
+                        print(f"   📄 Decoded filename: {decoded_filename}")
+                        
+                        # Check if filename contains 'редактированный' and contract info
+                        if '(редактированный)' in decoded_filename and '.docx' in decoded_filename:
+                            print("   ✅ Filename indicates custom document and has .docx extension")
+                        else:
+                            print("   ❌ Filename format incorrect for custom document")
+                            return False
                     else:
-                        print("   ❌ Filename format incorrect for custom document")
+                        print("   ❌ UTF-8 filename encoding not found")
                         return False
                 else:
                     print(f"   ❌ Wrong Content-Disposition: {content_disposition}")
