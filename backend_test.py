@@ -3493,6 +3493,7 @@ def main():
     
     # Direct contract test sequence
     direct_test_sequence = [
+        ("Section 11 Format Functionality", direct_tester.test_section_11_format_functionality),
         ("Contract Content Editing Workflow", direct_tester.test_contract_content_editing_workflow),
         ("Number to Words Conversion", direct_tester.test_number_to_words_conversion),
         ("Contract Number Generation", direct_tester.test_contract_number_generation),
