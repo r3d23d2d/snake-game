@@ -771,7 +771,33 @@ def create_default_contract_content(doc, contract_data):
 
 def create_word_contract(contract_data):
     """Create a Word document with the contract content"""
-    return create_word_contract_with_custom_content(contract_data, None)
+    doc = Document()
+    
+    # Set document margins - smaller margins to fit content in 3 pages
+    sections = doc.sections
+    for section in sections:
+        section.top_margin = Inches(0.8)
+        section.bottom_margin = Inches(0.8)
+        section.left_margin = Inches(1)
+        section.right_margin = Inches(1)
+    
+    # Set default font for entire document
+    style = doc.styles['Normal']
+    style.font.name = 'Times New Roman'
+    style.font.size = Pt(11)
+    
+    # Add standard title and header
+    add_title_and_header(doc, contract_data)
+    
+    # Contract parties
+    add_formatted_paragraph(doc, 
+        f'Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {contract_data["client_name"]}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:', 
+        alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
+    
+    # Create default contract content
+    create_default_contract_content(doc, contract_data)
+    
+    return doc
 
 # Helper function to convert MongoDB documents
 def prepare_for_mongo(data):
