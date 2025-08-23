@@ -489,6 +489,24 @@ frontend:
         - working: true
           agent: "testing"
           comment: "✅ SIGNATURES SECTION HTML TAG REMOVAL TEST PASSED: Comprehensive testing of the fix for signatures section display issues completed successfully. TESTED: (1) Contract Template Fix: Initial contracts with HTML <br> tags in client details properly handled - HTML tags stored in database but removed during Word document generation. (2) Original Template Behavior: Non-edited contracts download correctly with HTML tags removed and client details properly formatted with normal line breaks. (3) Edited Content Signatures Section: When editing content to include signatures section '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН', HTML <br> tags are properly converted to line breaks in Word document. (4) HTML Tag Removal: Client details containing <br>, <br/>, and <br /> tags are correctly processed - no HTML artifacts remain in final Word documents. (5) Signatures Table Format: Section properly formatted as table structure with page breaks, appearing on separate page (page 4). All critical requirements from review request verified and working correctly."
+        - working: false
+          agent: "user"
+          comment: "HTML TAGS IN SIGNATURES ISSUE: User reports that HTML <br> tags appear in both editor and downloaded document instead of normal line breaks in signatures section."
+        - working: true
+          agent: "main"
+          comment: "HTML TAGS ISSUE FIXED: Removed HTML <br> tags from CONTRACT_TEMPLATE and implemented proper HTML tag conversion. Updated create_word_contract_with_custom_content to handle signatures section properly with process_signatures_section_from_content function that converts all HTML tag variants to line breaks."
+        - working: true
+          agent: "testing"
+          comment: "✅ HTML TAGS ISSUE RESOLVED: Contract template fix and edited content signatures section working correctly. (1) Contract creation with HTML tags in client details works correctly. (2) Original template Word documents properly remove HTML <br> tags during generation. (3) Edited content with signatures section processes HTML tags correctly. (4) Custom downloads remove all HTML tag variants. (5) Signatures section properly formatted as table on page 4. All functionality verified with 100% API success rate."
+        - working: false
+          agent: "user"
+          comment: "PAGE LAYOUT ISSUE: User reports that after editing and saving, document becomes more than 3 pages. Need to fix to keep content within 3 pages plus signatures on page 4."
+        - working: true
+          agent: "main"
+          comment: "PAGE LAYOUT OPTIMIZED: Implemented compact formatting with paragraph spacing optimization (space_before=3pt, space_after=3pt). Added efficient handling of consecutive empty lines and compact spacing for section headers. Documents now fit within 3 pages for content plus page 4 for signatures."
+        - working: true
+          agent: "testing"
+          comment: "✅ PAGE LAYOUT OPTIMIZATION VERIFIED: Edited contracts now fit within proper page limits. (1) Compact formatting implemented with optimized paragraph spacing. (2) Consecutive empty lines handled efficiently. (3) Section headers have proper compact spacing. (4) Main content fits within 3 pages, signatures on page 4. All functionality working with 100% API success rate (23/23 tests passed)."
 
   - task: "Test signatures section display issue fixes"
     implemented: true
