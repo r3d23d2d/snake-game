@@ -18,7 +18,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isEditingContent, setIsEditingContent] = useState(false);
   const [editedContent, setEditedContent] = useState('');
-  const [hasUnsavedChanges, setHasUnsagedChanges] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isContentEdited, setIsContentEdited] = useState(false);
   const { toast } = useToast();
 
