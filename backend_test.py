@@ -1963,6 +1963,7 @@ ________________/Шамсутдинов Р.Р.    ________________/ООО Тес
         print("="*80)
         
         tests = [
+            ("Signatures Section HTML Tag Removal", self.test_signatures_section_html_tag_removal),
             ("Document Structure Preservation", self.test_document_structure_preservation),
             ("Contract Content Editing Workflow", self.test_contract_content_editing_workflow),
             ("Contract Content Editing", self.test_contract_content_editing),
