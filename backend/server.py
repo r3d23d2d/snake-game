@@ -435,13 +435,18 @@ def to_genitive_case(name_or_organization):
             return name + 'а'
 
 def add_formatted_paragraph(doc, text, bold=False, alignment=WD_ALIGN_PARAGRAPH.LEFT):
-    """Add a paragraph with consistent Times New Roman 11pt formatting"""
+    """Add a paragraph with consistent Times New Roman 11pt formatting and compact spacing"""
     para = doc.add_paragraph()
     run = para.add_run(text)
     run.font.name = 'Times New Roman'
     run.font.size = Pt(11)
     run.bold = bold
     para.alignment = alignment
+    
+    # Make spacing more compact to fit in 3 pages
+    para.space_before = Pt(3)
+    para.space_after = Pt(3)
+    
     return para
 
 def create_word_contract_with_custom_content(contract_data, custom_content=None):
