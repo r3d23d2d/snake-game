@@ -597,6 +597,29 @@ def create_word_contract_with_custom_content(contract_data, custom_content=None)
 
 def process_signatures_section_from_content(doc, remaining_lines, contract_data):
     """Process signatures section from edited content and create proper table"""
+    # Check if content contains markdown table format
+    table_found = False
+    executor_content = []
+    client_content = []
+    
+    for line in remaining_lines:
+        if line.strip().startswith('|') and '«Исполнитель»:' in line and '«Заказчик»:' in line:
+            table_found = True
+            continue
+        elif line.strip().startswith('|---'):
+            continue
+        elif line.strip().startswith('|') and table_found:
+            # Parse table row
+            parts = line.split('|')
+            if len(parts) >= 3:
+                executor_part = parts[1].strip()
+                client_part = parts[2].strip()
+                
+                if executor_part and executor_part not in ['', '**«Исполнитель»:**']:
+                    executor_content.append(executor_part)
+                if client_part and client_part not in ['', '**«Заказчик»:**']:
+                    client_content.append(client_part)
+    
     # Create table for signatures with equal height
     table = doc.add_table(rows=1, cols=2)
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -615,34 +638,45 @@ def process_signatures_section_from_content(doc, remaining_lines, contract_data)
     exec_run.font.name = 'Times New Roman'
     exec_run.font.size = Pt(11)
     
-    executor_details = [
-        "Индивидуальный предприниматель",
-        "Шамсутдинов Радис Раисович",  
-        "Юридический адрес организации",
-        "423040, Россия, Республика Татарстан,",
-        "Нурлатский р-н, г. Нурлат,",
-        "ул. им Р.С. Хамадеева, д. 9, кв. 8",
-        "ИНН 163205154150",
-        "ОГРНИП 319169000185092",
-        "Р/с 40802810700001303517",
-        "Банк АО «ТБанк»",
-        "Юридический адрес банка",
-        "127287, г. Москва, ул. Хуторская 2-я,",
-        "д.38А, стр. 26",
-        "К/с 30101810145250000974",
-        "ИНН банка 7710140679",
-        "БИК 044525974"
-    ]
-    
-    for detail in executor_details:
-        exec_detail_para = executor_cell.add_paragraph()
-        exec_detail_run = exec_detail_para.add_run(detail)
-        exec_detail_run.font.name = 'Times New Roman'
-        exec_detail_run.font.size = Pt(11)
-        # Make paragraph spacing more compact
-        exec_detail_para.space_after = Pt(0)
-        exec_detail_para.space_before = Pt(0)
-    
+    # Use executor content from table if found, otherwise use default
+    if executor_content:
+        for detail in executor_content:
+            if detail.strip() and not detail.startswith('_____'):
+                exec_detail_para = executor_cell.add_paragraph()
+                exec_detail_run = exec_detail_para.add_run(detail.strip())
+                exec_detail_run.font.name = 'Times New Roman'
+                exec_detail_run.font.size = Pt(11)
+                exec_detail_para.space_after = Pt(0)
+                exec_detail_para.space_before = Pt(0)
+    else:
+        # Default executor details
+        executor_details = [
+            "Индивидуальный предприниматель",
+            "Шамсутдинов Радис Раисович",  
+            "Юридический адрес организации",
+            "423040, Россия, Республика Татарстан,",
+            "Нурлатский р-н, г. Нурлат,",
+            "ул. им Р.С. Хамадеева, д. 9, кв. 8",
+            "ИНН 163205154150",
+            "ОГРНИП 319169000185092",
+            "Р/с 40802810700001303517",
+            "Банк АО «ТБанк»",
+            "Юридический адрес банка",
+            "127287, г. Москва, ул. Хуторская 2-я,",
+            "д.38А, стр. 26",
+            "К/с 30101810145250000974",
+            "ИНН банка 7710140679",
+            "БИК 044525974"
+        ]
+        
+        for detail in executor_details:
+            exec_detail_para = executor_cell.add_paragraph()
+            exec_detail_run = exec_detail_para.add_run(detail)
+            exec_detail_run.font.name = 'Times New Roman'
+            exec_detail_run.font.size = Pt(11)
+            exec_detail_para.space_after = Pt(0)
+            exec_detail_para.space_before = Pt(0)
+
     # Add signature line for executor
     exec_sig_para = executor_cell.add_paragraph()
     exec_sig_para.add_run("")  # Empty space
@@ -661,27 +695,33 @@ def process_signatures_section_from_content(doc, remaining_lines, contract_data)
     client_run.font.name = 'Times New Roman'
     client_run.font.size = Pt(11)
     
-    # Format client details from contract data - Remove HTML tags
-    client_details_text = contract_data.get('client_details', contract_data['client_name'])
-    # Remove HTML tags and replace with actual line breaks
-    client_details_text = client_details_text.replace('<br>', '\n').replace('<br/>', '\n').replace('<br />', '\n')
-    client_details_lines = client_details_text.split('\n')
+    # Use client content from table if found, otherwise from contract data
+    if client_content:
+        for detail in client_content:
+            if detail.strip() and not detail.startswith('_____'):
+                client_detail_para = client_cell.add_paragraph()
+                client_detail_run = client_detail_para.add_run(detail.strip())
+                client_detail_run.font.name = 'Times New Roman'
+                client_detail_run.font.size = Pt(11)
+                client_detail_para.space_after = Pt(0)
+                client_detail_para.space_before = Pt(0)
+    else:
+        # Format client details from contract data - Remove HTML tags
+        client_details_text = contract_data.get('client_details', contract_data['client_name'])
+        # Remove HTML tags and replace with actual line breaks
+        client_details_text = client_details_text.replace('<br>', '\n').replace('<br/>', '\n').replace('<br />', '\n')
+        client_details_lines = client_details_text.split('\n')
+        
+        for detail in client_details_lines:
+            if detail.strip():  # Only add non-empty lines
+                client_detail_para = client_cell.add_paragraph()
+                client_detail_run = client_detail_para.add_run(detail.strip())
+                client_detail_run.font.name = 'Times New Roman'
+                client_detail_run.font.size = Pt(11)
+                client_detail_para.space_after = Pt(0)
+                client_detail_para.space_before = Pt(0)
     
-    for detail in client_details_lines:
-        if detail.strip():  # Only add non-empty lines
-            client_detail_para = client_cell.add_paragraph()
-            client_detail_run = client_detail_para.add_run(detail.strip())
-            client_detail_run.font.name = 'Times New Roman'
-            client_detail_run.font.size = Pt(11)
-            # Make paragraph spacing more compact
-            client_detail_para.space_after = Pt(0)
-            client_detail_para.space_before = Pt(0)
-    
-    # Add empty lines to match executor height
-    for _ in range(max(0, len(executor_details) - len([line for line in client_details_lines if line.strip()]))):
-        client_cell.add_paragraph("")
-    
-    # Add signature line for client (on same level as executor)
+    # Add signature line for client
     client_sig_para = client_cell.add_paragraph()
     client_sig_para.add_run("")  # Empty space
     client_sig_para = client_cell.add_paragraph()
