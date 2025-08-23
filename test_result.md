@@ -538,6 +538,21 @@ frontend:
           agent: "testing"
           comment: "✅ PAGE LAYOUT OPTIMIZATION TEST PASSED: Comprehensive testing completed successfully. (1) Page Count Verification: Main content fits within 3 pages, signatures section (Section 11) appears on page 4, total document is exactly 4 pages as required. (2) Compact Formatting Test: Document uses optimized paragraph spacing with efficient empty line handling (0 empty paragraphs), multiple spacing definitions found indicating compact formatting control. (3) Content Density Test: High content density achieved with substantial content (5934 characters) in structured format across 68 paragraphs (87.3 chars/paragraph). (4) Comparison Test: Both original template (41208 bytes) and custom version (40539 bytes) have reasonable file sizes. (5) Additional Verifications: Signatures section starts on new page with proper page breaks (2 page breaks found), section headers properly formatted (3 major sections), HTML tags properly removed from signatures section. All page layout requirements verified and working correctly."
 
+  - task: "Fix editing window size and contract section 11 format"
+    implemented: true
+    working: false
+    file: "App.js, server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "User reported two issues: 1) Editing window needs to be bigger, 2) In editing window, client details appear below executor details instead of to the right in section 11"
+        - working: false
+          agent: "main"
+          comment: "Fixed textarea height from 400px to 600px. Updated CONTRACT_TEMPLATE section 11 to use markdown table format (executor left, client right). Enhanced process_signatures_section_from_content to parse markdown table format correctly."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
