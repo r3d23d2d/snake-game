@@ -382,7 +382,7 @@ function App() {
                         Редактировать
                       </Button>
                       <Button
-                        onClick={downloadCustomContract}
+                        onClick={handleDownload}
                         className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
                       >
                         Скачать Word
