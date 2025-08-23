@@ -82,6 +82,8 @@ function App() {
       });
       
       setCurrentContract(response.data);
+      setIsContentEdited(false);
+      setHasUnsavedChanges(false);
       setContractForm({
         name_or_organization: '',
         other_details: '',
