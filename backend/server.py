@@ -1012,62 +1012,20 @@ async def download_custom_contract_word(contract_id: str):
     
     contract_obj = ContractNew(**parse_from_mongo(contract))
     
-    # Create Word document with custom content
-    doc = Document()
+    # Prepare contract data for Word generation
+    contract_data = {
+        "contract_number": contract_obj.contract_number,
+        "client_name": contract_obj.client_name,
+        "service_cost": str(contract_obj.service_cost),
+        "service_cost_words": contract_obj.service_cost_words,
+        "contract_end_date": contract_obj.contract_end_date,
+        "contract_end_month": contract_obj.contract_end_month,
+        "contract_end_year": contract_obj.contract_end_year,
+        "client_details": contract_obj.client_details
+    }
     
-    # Set document margins and style
-    section = doc.sections[0]
-    section.top_margin = Inches(0.8)
-    section.bottom_margin = Inches(0.8)
-    section.left_margin = Inches(0.8)
-    section.right_margin = Inches(0.8)
-    
-    # Add header with Kazan and date
-    header_table = doc.add_table(rows=1, cols=2)
-    header_table.alignment = WD_TABLE_ALIGNMENT.CENTER
-    header_table.columns[0].width = Inches(3)
-    header_table.columns[1].width = Inches(3)
-    
-    # Left cell - Kazan
-    left_cell = header_table.cell(0, 0)
-    left_para = left_cell.paragraphs[0]
-    left_run = left_para.add_run("Казань")
-    left_run.font.name = 'Times New Roman'
-    left_run.font.size = Pt(11)
-    left_para.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    
-    # Right cell - Date
-    right_cell = header_table.cell(0, 1)
-    right_para = right_cell.paragraphs[0]
-    current_date = datetime.now(timezone(timedelta(hours=3)))
-    months_ru = ["января", "февраля", "марта", "апреля", "мая", "июня",
-                 "июля", "августа", "сентября", "октября", "ноября", "декабря"]
-    date_str = f"{current_date.day} {months_ru[current_date.month - 1]} {current_date.year} г."
-    right_run = right_para.add_run(date_str)
-    right_run.font.name = 'Times New Roman'
-    right_run.font.size = Pt(11)
-    right_para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    
-    # Add contract title at the very top
-    title_para = doc.add_paragraph()
-    title_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    title_run = title_para.add_run(f"Договор об оказании услуг № {contract_obj.contract_number}")
-    title_run.font.name = 'Times New Roman'
-    title_run.font.size = Pt(14)
-    title_run.bold = True
-    
-    # Add custom content as paragraphs
-    content_lines = contract_obj.contract_content.split('\n')
-    for line in content_lines:
-        if line.strip():
-            para = doc.add_paragraph()
-            run = para.add_run(line)
-            run.font.name = 'Times New Roman'
-            run.font.size = Pt(11)
-            para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        else:
-            # Add empty paragraph for spacing
-            doc.add_paragraph()
+    # Create Word document with custom content but preserved formatting
+    doc = create_word_contract_with_custom_content(contract_data, contract_obj.contract_content)
     
     # Save to BytesIO
     doc_buffer = io.BytesIO()
