@@ -2256,4 +2256,47 @@ def main():
         return 1
 
 if __name__ == "__main__":
-    sys.exit(main())
+    print("🚀 Starting Contract Management System Backend Testing")
+    print("=" * 60)
+    
+    # Initialize tester with the correct URL from frontend/.env
+    tester = DirectContractTester()
+    
+    try:
+        # Run the specific regression tests for contract editing functionality
+        print("\n🎯 FOCUS: Contract Content Editing and Download Regression Tests")
+        print("   Testing the fix for document structure preservation issue")
+        
+        regression_success = tester.run_contract_editing_regression_tests()
+        
+        # Summary
+        print(f"\n{'='*80}")
+        print("📋 FINAL TEST SUMMARY")
+        print(f"{'='*80}")
+        print(f"Total Tests Run: {tester.tests_run}")
+        print(f"Tests Passed: {tester.tests_passed}")
+        print(f"Success Rate: {(tester.tests_passed/tester.tests_run)*100:.1f}%")
+        
+        if regression_success:
+            print("\n🎉 REGRESSION TESTS PASSED!")
+            print("✅ Contract content editing and download functionality working correctly")
+            print("✅ Document structure preservation appears to be fixed")
+        else:
+            print("\n⚠️  REGRESSION TESTS FAILED!")
+            print("❌ Contract content editing or download functionality has issues")
+            print("❌ Document structure preservation may still have problems")
+        
+        # Cleanup
+        tester.cleanup_contracts()
+        
+        # Exit with appropriate code
+        sys.exit(0 if regression_success else 1)
+        
+    except KeyboardInterrupt:
+        print("\n⏹️  Testing interrupted by user")
+        tester.cleanup_contracts()
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n💥 Testing failed with error: {str(e)}")
+        tester.cleanup_contracts()
+        sys.exit(1)
