@@ -559,6 +559,21 @@ frontend:
           agent: "testing"
           comment: "✅ COMPREHENSIVE SECTION 11 MARKDOWN FORMAT TEST PASSED: All critical requirements verified successfully. (1) Contract Creation: New contracts created with markdown table format in section 11, with executor details on left and client details on right. (2) Database Storage: contract_content field contains proper markdown table structure with '| **«Исполнитель»:** | **«Заказчик»:** |' header, '|---|---|' separator, and executor/client details in correct columns. (3) Contract Editing: Edited content preserves markdown table format correctly, including client address and INN in right column. (4) Original Word Download: Markdown table properly converted to Word table format with <w:tbl>, <w:tr>, <w:tc> structure, executor on left, client on right, HTML tags removed. (5) Custom Word Download: Edited contracts with section 11 generate proper Word tables with custom client details correctly positioned. (6) process_signatures_section_from_content Function: Successfully parses markdown table format and creates proper Word table structure. All 27 API calls successful (100% success rate). The section 11 format changes work correctly and client details appear to the right of executor details in both editing interface and final Word documents as requested."
 
+  - task: "Test corrected contract section 11 format functionality"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Review request to test the corrected contract section 11 format functionality. The CONTRACT_TEMPLATE was changed from markdown table to normal text format. Need to test: (1) Create new contract with client details, (2) Verify contract_content contains section 11 with normal text format (no markdown pipes), (3) Test editing contract content, (4) Test downloading both original and custom Word documents, (5) Verify process_signatures_section_from_content function works with new text format."
+        - working: true
+          agent: "testing"
+          comment: "✅ SECTION 11 FORMAT FUNCTIONALITY TEST PASSED: Comprehensive testing completed successfully with 7/7 tests passed (100% success rate). VERIFIED: (1) Contract Creation: New contracts created with client details work correctly. (2) Database Format: contract_content contains section 11 with normal text format - NO markdown table pipes (|) found, executor details positioned before client details using spaces. (3) Contract Editing: Section 11 preserved in edited content with normal text format, both executor and client sections found correctly. (4) Original Word Download: Word table structure found with executor on left, client on right, HTML br tags properly removed. (5) Custom Word Download: Word table structure maintained in custom documents, section 11 header found, custom client details present. (6) Function Verification: process_signatures_section_from_content function works correctly with new text format, processes different client details properly. The goal achieved: no markdown table formatting (no | pipes) in text editor, client details appear properly formatted to the right of executor details, Word document generation creates proper table structure, text editor shows clean readable format."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
