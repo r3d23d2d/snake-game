@@ -1,37 +1,25 @@
 <analysis>
-The AI engineer successfully enhanced the contract generation application by addressing user feedback. Initial work involved removing a specific frontend text and adding contract content editing functionality. This required new Pydantic models and a PUT endpoint in  and corresponding UI updates in . Subsequently, the user requested a precise filename format (Договор для [client in genitive case]) and further UI simplification. A  helper was introduced in the backend. A critical bug, where the internal Word document title was incorrectly altered and filenames were wrong, was swiftly resolved by reverting the internal title change and implementing accurate filename generation with UTF-8 encoding. All backend tests passed, and frontend previews confirmed fixes. The core content editing is functional, but the broader editing and saving the *final generated Word document* remains to be fully developed and defined.
+The trajectory details the work of an AI engineer on a contract generation application. Initially, the engineer focused on enhancing existing functionality by simplifying the UI to only show the document name, Edit, and Download Word buttons. This involved significant modifications to , removing various parameters, fields, and associated functions. Following this, a critical bug emerged: downloaded Word documents did not reflect content edits. The engineer attempted a fix by directing all downloads through  in , based on the assumption that this backend endpoint correctly handled updated . While backend tests passed, this change introduced a severe regression, causing the downloaded Word document to lose its original structure and appear garbled. The conversation concludes with the acknowledgment of this regression, indicating a need to re-evaluate the document generation and editing logic.
 </analysis>
 
 <product_requirements>
-The application is a single-page contract generation service.
-**Core Features:**
-*   **Unified Page:** Single-page operation.
-*   **Dynamic Fields:** Стоимость (Cost) with Стоимость прописью; Дата окончания договора with month, half-year, year; auto-generated Номер договора.
-*   **Interaction:** View, implicit edit, download upon creation.
-*   **Client Management:** Client saving removed.
-*   **Word Formatting:** Times New Roman 11pt, fit within 3 pages, consistent signature alignment.
-*   **Document Header:** Казань (top-left) and Moscow-time signing date (top-right).
-*   **End Date Fix:** Corrected half-year duration calculation.
-*   **Section 11:** ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН on new page, compact line spacing.
-*   **Title Prominence:** Contract title (e.g., Договор об оказании услуг № КР...) at top, 14pt, bold, centered.
-*   **Time Zone:** All generated dates use Moscow time (UTC+3).
+The application is a single-page service for generating contracts. Key features include dynamic fields for cost, end date, and auto-generated contract numbers, with output in a formatted Word document (Times New Roman 11pt, within 3 pages, consistent signature alignment). Specific formatting rules apply: Казань top-left, Moscow-time signing date top-right, Section 11 on a new page with compact spacing, and a prominent (14pt, bold, centered) contract title. All dates must use Moscow time.
 
-**Recent Enhancements:**
-*   **UI Text Removal:** Eliminated Создавайте договоры с автоматической генерацией номера и стоимости прописью.
-*   **Document Editing:** Enabled editing of contract text content.
-*   **UI Simplification:** Display only contract title/number, edit, and download buttons.
-*   **Filename Format:** Downloaded Word document filename is Договор для [Organization/Full Name in Genitive Case].docx.
-*   **Internal Title Integrity:** Internal Word document title Договор об оказании услуг № КР... must remain unchanged.
+Recent enhancements have focused on:
+1.  **UI Simplification**: The user explicitly requested to remove all extraneous elements from the frontend, leaving only the document title, an Edit button, and a Download Word button. This covers both the initial contract creation state and the post-creation view.
+2.  **Document Content Editing**: The ability to edit the contract's plain text content directly within the browser, with these changes being saved and reflected in the downloaded Word document.
+3.  **Filename Format**: Downloaded files must adhere to Договор для [Organization/Full Name in Genitive Case].docx.
+4.  **Internal Title Integrity**: The internal Word document title (Договор об оказании услуг № КР...) must remain unchanged, regardless of external edits or display.
 </product_requirements>
 
 <key_technical_concepts>
--   **FastAPI**: Python web framework.
--   **React**: JavaScript library for UI.
--   **MongoDB**: NoSQL database.
--   **python-docx**: Python library for Word document generation.
--   **Pydantic**: Data validation for Python models.
--   ** / **: Python for time zone-aware date calculations.
--   ****: For URL encoding filenames with Cyrillic.
+-   **FastAPI**: Python web framework for backend API.
+-   **React**: JavaScript library for building the frontend UI.
+-   **MongoDB**: NoSQL database for storing contract data.
+-   **python-docx**: Python library for Word document generation and manipulation.
+-   **Pydantic**: Data validation and settings management for Python.
+-   ****: Used for URL encoding, especially for Cyrillic characters in filenames.
+-   ** / **: Python modules for date/time handling, including time zone awareness.
 </key_technical_concepts>
 
 <code_architecture>
@@ -41,40 +29,48 @@ The application uses a React frontend, FastAPI backend, and MongoDB database.
 
 
 -   **/app/backend/server.py**:
-    -   **Importance**: Handles FastAPI routes, DB interactions, and contract generation logic.
-    -   **Changes Made**:
-        -   ** Pydantic Model**: Added for updating contract text content.
-        -   ** Endpoint**: New PUT endpoint () for updating the  field in MongoDB.
-        -   ** Function**: Implemented a simplified helper for genitive case conversion in client names (e.g., для [Name]).
-        -   ** Function**: Reverted changes that incorrectly altered the internal Word document title, ensuring it remains Договор об оказании услуг № КР....
-        -   **Filename Generation**: Updated logic in  and  to produce filenames like Договор для [Client Name].docx with  for Cyrillic compatibility.
-        -   Existing logic for Moscow time, Word formatting (Kazan/date header, Section 11 new page, compact requisites, prominent title) is preserved.
+    -   **Importance**: Centralizes FastAPI routes, MongoDB interactions, and core contract generation/manipulation logic.
+    -   **Previous Changes (prior to current trajectory)**:
+        -   ** Pydantic Model**: For updating contract text.
+        -   ** Endpoint**: PUT  to modify  in DB.
+        -   ** Function**: Helper for client name genitive case conversion.
+        -   ** Function**: Reverted internal Word document title changes.
+        -   **Filename Generation**: Updated in  and  for Договор для [Client Name].docx with .
+    -   **Changes Made in trajectory**: No direct changes to this file were explicitly shown, but the AI engineer concluded that the backend's  endpoint would be used for downloading edited content.
 
 -   **/app/frontend/src/App.js**:
-    -   **Importance**: Manages the user interface and interactions.
-    -   **Changes Made**:
-        -   **Text Removal**: The promotional text Создавайте договоры с автоматической генерацией номера и стоимости прописью was removed.
-        -   **Content Editing UI**: Added states (, ), functions (, , ), and UI elements (textarea, buttons) to enable in-browser text content editing.
-        -   **UI Simplification**: Streamlined the interface to display only the contract number, client name, and core action buttons (edit parameters, edit content, download).
-        -   **Filename Alignment**: Updated frontend download logic to match backend's Договор для [Client Name].docx naming convention.
-        -   **Display Title Reversion**: Frontend display of the contract title was reverted to the standard format.
+    -   **Importance**: Renders the main user interface, manages application state, and handles user interactions (creating, editing, downloading contracts).
+    -   **Previous Changes (prior to current trajectory)**:
+        -   Removed Создавайте договоры... promotional text.
+        -   Added UI for in-browser text content editing (states like , , , , ).
+        -   Streamlined UI to show contract number, client name, and main action buttons.
+        -   Frontend download logic aligned with Договор для [Client Name].docx.
+        -   Reverted frontend display of contract title to standard format.
+    -   **Changes Made in trajectory**:
+        -   **UI Simplification**: Removed numerous UI elements related to Номер договора отдельно, Дата создания, Выпадающий список просмотра текста, and Редактирование параметров договора. This involved removing , ,  state, and their associated JSX.
+        -   **Download Logic Fix Attempt**: Modified the Скачать Word button's  handler to *always* call  instead of  for all downloads, attempting to ensure edited content is downloaded.
+        -   **State Management Removal**: Removed  state and its related updates after the decision to always use .
+        -   **Toast Messages**: Updated toast messages for download success/error.
+        -   **Function Removal**:  function was removed as it was deemed unused.
 
--   **/app/backend/requirements.txt**:
-    -   **Importance**: Manages Python dependencies. No explicit modifications mentioned as  is standard.
-
--   **/app/frontend/.env & /app/backend/.env**:
-    -   **Importance**: Store environment variables. No direct modifications were made.
+-   **/app/backend/requirements.txt & /app/frontend/.env & /app/backend/.env**:
+    -   No explicit modifications were made to these files during the documented trajectory.
 </code_architecture>
 
 <pending_tasks>
--   **Document Editing and Saving Enhancement**: Fully implement the capability for users to edit the *final generated Word document* itself (not just its text content) in a rich editor and save those direct Word document modifications.
+-   **Address Document Structure Regression**: Restore the original Word document structure while ensuring content edits are reflected in the download. The current approach of always using  caused a critical regression.
+-   **Full Document Editing and Saving Enhancement**: Fully implement the capability for users to edit the *final generated Word document itself* (not just its text content) in a rich editor and save those direct Word document modifications (this was an initial pending task and remains unaddressed beyond text content editing).
 -   **Comprehensive Frontend UI/Document Validation**: Conduct a full validation of the generated Word document's visual adherence to all formatting rules (Kazan/Date, title font, compact requisite line spacing, Section 11 new page, signature alignment).
 </pending_tasks>
 
 <current_work>
-The application has been refined into a single-page contract generation service. Most recently, the AI engineer addressed several user-specific requirements. A promotional text was removed from the frontend. The backend () was enhanced with a  Pydantic model and a new  endpoint, allowing users to edit the contract's plain text content, which is then stored in MongoDB. The frontend () was updated to include a  for this editing, along with relevant state management and UI buttons. The user also requested a specific filename format, Договор для [Organization/Full Name in Genitive Case].docx, and further UI simplification. A  function was added to the backend, and both frontend and backend filename generation logic were updated to correctly apply this format, including proper UTF-8 encoding for Cyrillic characters. Crucially, a bug where the internal Word document title was mistakenly changed was fixed, reverting it to its standard Договор об оказании услуг № КР... format, and the frontend display for the contract title was also corrected. All backend modifications were successfully tested, and frontend visual changes, including the simplified UI and correct filenames, were validated through screenshots. The current state allows editing of the contract's *text content* which updates the database.
+Immediately before this summary request, the AI engineer was addressing a critical regression. Following previous UI simplification where only the document title, Edit button, and Download Word button remained, a bug was reported: content edits were not appearing in the downloaded Word document.
+
+To fix this, the AI engineer modified  to ensure the Download Word button *always* invoked the  function (backend endpoint ) rather than the original  function. The rationale was that  would retrieve the  from the database, which should contain the user's edits. Associated UI states and unused functions (like  and ) were subsequently removed from .
+
+Backend testing () indicated success for the content editing and download functionality. However, a new user report stated that the downloaded document *lost all its structure* and displayed unclear text after this change, indicating a severe regression caused by always using . The AI engineer has acknowledged this regression and is in the initial phase of re-analyzing the problem.
 </current_work>
 
 <optional_next_step>
-Clarify and implement the full document editing and saving feature for the generated Word document.
+Analyze the difference between  and  in  to correctly integrate content edits without losing document structure.
 </optional_next_step>
