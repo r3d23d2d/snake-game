@@ -492,9 +492,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Fix contract content editing and download functionality"
+    []
   stuck_tasks: 
-    - "Fix contract content editing and download functionality"
+    []
   test_all: false
   test_priority: "high_first"
 
