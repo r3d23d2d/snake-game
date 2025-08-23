@@ -419,8 +419,8 @@ def add_formatted_paragraph(doc, text, bold=False, alignment=WD_ALIGN_PARAGRAPH.
     para.alignment = alignment
     return para
 
-def create_word_contract(contract_data):
-    """Create a Word document with the contract content"""
+def create_word_contract_with_custom_content(contract_data, custom_content=None):
+    """Create a Word document with custom content but preserved formatting"""
     doc = Document()
     
     # Set document margins - smaller margins to fit content in 3 pages
@@ -476,11 +476,48 @@ def create_word_contract(contract_data):
     # Empty line after header
     doc.add_paragraph()
     
-    # Contract parties
-    add_formatted_paragraph(doc, 
-        f'Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {contract_data["client_name"]}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:', 
-        alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
+    # If custom content is provided, use it; otherwise use default template structure
+    if custom_content:
+        # Parse and format custom content with proper font settings
+        content_lines = custom_content.split('\n')
+        for line in content_lines:
+            if line.strip():
+                # Check if line looks like a section header (all caps or bold formatting)
+                if line.strip().isupper() or line.startswith('**') and line.endswith('**'):
+                    # Format as section header
+                    para = doc.add_paragraph()
+                    # Remove markdown bold markers if present
+                    clean_line = line.replace('**', '').strip()
+                    run = para.add_run(clean_line)
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(11)
+                    run.bold = True
+                    para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                else:
+                    # Format as regular content
+                    para = doc.add_paragraph()
+                    run = para.add_run(line.strip())
+                    run.font.name = 'Times New Roman'
+                    run.font.size = Pt(11)
+                    para.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+            else:
+                # Add empty paragraph for spacing
+                doc.add_paragraph()
+    else:
+        # Use the original structured content creation (existing logic)
+        # Contract parties
+        add_formatted_paragraph(doc, 
+            f'Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и {contract_data["client_name"]}, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:', 
+            alignment=WD_ALIGN_PARAGRAPH.JUSTIFY)
+        
+        # Continue with rest of structured content...
+        # (keeping original logic for when no custom content is provided)
+        create_default_contract_content(doc, contract_data)
     
+    return doc
+
+def create_default_contract_content(doc, contract_data):
+    """Create the default structured contract content"""
     # Section 1 - Subject
     add_formatted_paragraph(doc, 
         "1. ПРЕДМЕТ ДОГОВОРА", 
@@ -662,8 +699,10 @@ def create_word_contract(contract_data):
     client_sig_run = client_sig_para.add_run(f"________________/{contract_data['client_name']}")
     client_sig_run.font.name = 'Times New Roman' 
     client_sig_run.font.size = Pt(11)
-    
-    return doc
+
+def create_word_contract(contract_data):
+    """Create a Word document with the contract content"""
+    return create_word_contract_with_custom_content(contract_data, None)
 
 # Helper function to convert MongoDB documents
 def prepare_for_mongo(data):
