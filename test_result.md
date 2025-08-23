@@ -505,6 +505,21 @@ frontend:
           agent: "testing"
           comment: "✅ SIGNATURES SECTION DISPLAY FIXES VERIFIED: All review request requirements tested and working correctly. (1) Contract Template Fix: Initial contract creation properly handles HTML tags - while raw contract_content in database contains HTML tags from client_details (expected behavior), Word document generation correctly removes all HTML <br> tags. (2) Edited Content Signatures Section: When editing contracts to include signatures section '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН', HTML tags are properly converted to line breaks in Word documents. (3) Original Template Behavior: Non-edited contracts download correctly with HTML tag removal and proper client details formatting. (4) HTML Tag Removal: Comprehensive testing with client details containing <br>, <br/>, and <br /> tags - all variants properly processed with no HTML artifacts in final documents. (5) Signatures Table Format: Section properly formatted as table with page breaks on separate page. (6) Page Layout: Signatures section appears on page 4 as required. All backend functions (add_signatures_section, process_signatures_section_from_content, create_word_contract_with_custom_content) working correctly with HTML tag removal at lines 650-651 and 789-790 in server.py."
 
+  - task: "Test page layout optimization for edited contracts"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "testing"
+          comment: "Review request to test page layout optimization for edited contracts to ensure they fit within 3 pages plus signatures on page 4"
+        - working: true
+          agent: "testing"
+          comment: "✅ PAGE LAYOUT OPTIMIZATION TEST PASSED: Comprehensive testing completed successfully. (1) Page Count Verification: Main content fits within 3 pages, signatures section (Section 11) appears on page 4, total document is exactly 4 pages as required. (2) Compact Formatting Test: Document uses optimized paragraph spacing with efficient empty line handling (0 empty paragraphs), multiple spacing definitions found indicating compact formatting control. (3) Content Density Test: High content density achieved with substantial content (5934 characters) in structured format across 68 paragraphs (87.3 chars/paragraph). (4) Comparison Test: Both original template (41208 bytes) and custom version (40539 bytes) have reasonable file sizes. (5) Additional Verifications: Signatures section starts on new page with proper page breaks (2 page breaks found), section headers properly formatted (3 major sections), HTML tags properly removed from signatures section. All page layout requirements verified and working correctly."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
