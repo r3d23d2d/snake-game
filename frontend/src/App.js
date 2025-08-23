@@ -225,6 +225,8 @@ function App() {
     setCurrentContract(null);
     setIsEditingContent(false);
     setEditedContent('');
+    setIsContentEdited(false);
+    setHasUnsavedChanges(false);
     setContractForm({
       name_or_organization: '',
       other_details: '',
