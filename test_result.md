@@ -561,7 +561,7 @@ metadata:
 
 test_plan:
   current_focus:
-    []
+    - "Fix editing window size and contract section 11 format"
   stuck_tasks: 
     []
   test_all: false
