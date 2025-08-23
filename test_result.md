@@ -462,11 +462,11 @@ frontend:
 
   - task: "Fix contract content editing and download functionality" 
     implemented: true
-    working: false
+    working: true
     file: "App.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
           agent: "user"
@@ -480,6 +480,9 @@ frontend:
         - working: false
           agent: "user"
           comment: "REGRESSION: User reports that after editing document, downloaded contract changes text structure, font sizes, etc. The document should remain exactly the same in formatting. The current downloadCustomContract approach loses document structure."
+        - working: true
+          agent: "testing"
+          comment: "✅ REGRESSION TESTS PASSED: Contract content editing and download functionality working correctly with document structure preservation. COMPREHENSIVE TESTING COMPLETED: (1) Document Structure Preservation: Title format 'Договор об оказании услуг № [number]' preserved, Kazan/date header preserved, Times New Roman font references found in styles, section headers properly bold formatted, document structure maintained with proper paragraph count. (2) Content Integration: All edited content properly integrated including custom clauses, new sections, and verification markers. (3) Filename Handling: Genitive case conversion working correctly (Петров → Петрова, Петр → Петра, Петрович → Петровича), '(редактированный)' suffix properly added, UTF-8 encoding for Cyrillic characters working. (4) Complete Workflow: Create contract → Edit content → Save changes → Download custom document → Verify Word document contains edited content with preserved formatting. (5) API Endpoints: PUT /api/contracts/direct/{id}/content and GET /api/contracts/direct/{id}/download_custom both working correctly. (6) Word Document Verification: All edited content found in downloaded documents with proper structure preservation. Test Results: 15/15 tests passed (100% success rate). The regression issue has been RESOLVED - the create_word_contract_with_custom_content function now properly preserves document structure while integrating edited content."
 
 metadata:
   created_by: "main_agent"
