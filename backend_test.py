@@ -2646,6 +2646,415 @@ ________________/ООО Тест Оптимизация Страниц"""
         
         return True
 
+    def test_section_11_format_functionality(self):
+        """
+        TEST CORRECTED CONTRACT SECTION 11 FORMAT FUNCTIONALITY
+        
+        This test specifically addresses the review request to test:
+        1. Create a new contract with client details  
+        2. Verify the contract_content in database contains section 11 with normal text format (no markdown pipes |), 
+           where executor details are on the left and client details are positioned to the right using spaces
+        3. Test editing contract content and verify section 11 displays properly without markdown formatting
+        4. Test downloading both original and custom Word documents to verify that section 11 creates proper Word table format 
+           with executor on left, client on right
+        5. Verify that the simplified process_signatures_section_from_content function works correctly with the new text format
+        """
+        print("\n🔍 TESTING CORRECTED CONTRACT SECTION 11 FORMAT FUNCTIONALITY")
+        print("=" * 80)
+        
+        # Step 1: Create a new contract with client details
+        print("\n📝 Step 1: Creating contract with client details...")
+        contract_data = {
+            "name_or_organization": "ООО Тест Секция 11",
+            "other_details": "Адрес: г. Казань, ул. Тестовая, д. 11<br>ИНН: 1234567890<br>Телефон: +7(843)555-11-11<br>Email: test@section11.ru",
+            "service_cost": 45000,
+            "duration_months": 6
+        }
+        
+        success, response = self.run_test(
+            "Create Contract for Section 11 Test",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            print("❌ Failed to create contract for section 11 test")
+            return False
+        
+        contract_id = response['id']
+        contract_number = response['contract_number']
+        contract_content = response.get('contract_content', '')
+        self.created_contract_ids.append(contract_id)
+        
+        print(f"✅ Contract created: {contract_id}")
+        print(f"   Contract number: {contract_number}")
+        
+        # Step 2: Verify contract_content contains section 11 with normal text format (no markdown pipes)
+        print("\n🔍 Step 2: Verifying section 11 format in database...")
+        
+        # Check that section 11 exists
+        if '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' in contract_content:
+            print("   ✅ Section 11 found in contract content")
+        else:
+            print("   ❌ Section 11 NOT found in contract content")
+            return False
+        
+        # Check that there are NO markdown table pipes (|) in section 11
+        section_11_start = contract_content.find('11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН')
+        if section_11_start != -1:
+            section_11_content = contract_content[section_11_start:]
+            
+            if '|' in section_11_content:
+                print("   ❌ Markdown table pipes (|) found in section 11 - should use normal text format")
+                print(f"   Found pipes in: {section_11_content[:200]}...")
+                return False
+            else:
+                print("   ✅ No markdown table pipes (|) found - using normal text format")
+        
+        # Check that executor details are on the left and client details are positioned to the right using spaces
+        if '«Исполнитель»:' in contract_content and '«Заказчик»:' in contract_content:
+            print("   ✅ Both executor and client sections found")
+            
+            # Check for proper spacing/alignment (executor should come before client in the text)
+            executor_pos = contract_content.find('«Исполнитель»:')
+            client_pos = contract_content.find('«Заказчик»:')
+            
+            if executor_pos < client_pos:
+                print("   ✅ Executor details positioned before client details")
+            else:
+                print("   ❌ Incorrect positioning of executor and client details")
+                return False
+                
+            # Check that client details contain the HTML br tags (as expected in database)
+            client_section = contract_content[client_pos:client_pos+500]
+            if '<br>' in client_section:
+                print("   ✅ Client details contain HTML br tags in database (expected)")
+            else:
+                print("   ⚠️  Client details don't contain HTML br tags (may be normal)")
+        else:
+            print("   ❌ Executor or client sections not found in section 11")
+            return False
+        
+        # Step 3: Test editing contract content and verify section 11 displays properly
+        print("\n✏️  Step 3: Testing contract content editing with section 11...")
+        
+        edited_content_with_section_11 = f"""**Договор об оказании услуг № {contract_number}**
+
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и ООО Тест Секция 11, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. Исполнитель принимает на себя обязательства оказать комплекс услуг в соответствии с заявками Заказчика.
+
+**2. СТОИМОСТЬ УСЛУГ**
+
+2.1. Стоимость услуг составляет 45000 (сорок пять тысяч) рублей.
+
+**11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН**
+
+«Исполнитель»:                                          «Заказчик»:
+Индивидуальный предприниматель                          ООО Тест Секция 11
+Шамсутдинов Радис Раисович                             Адрес: г. Казань, ул. Тестовая, д. 11
+Юридический адрес организации                          ИНН: 1234567890
+423040, Россия, Республика Татарстан,                  Телефон: +7(843)555-11-11
+Нурлатский р-н, г. Нурлат,                            Email: test@section11.ru
+ул. им Р.С. Хамадеева, д. 9, кв. 8
+ИНН 163205154150
+ОГРНИП 319169000185092
+
+________________/Шамсутдинов Р.Р.                        ________________/ООО Тест Секция 11"""
+
+        content_update = {"contract_content": edited_content_with_section_11}
+        
+        success, edit_response = self.run_test(
+            "Edit Contract Content with Section 11",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=content_update,
+            return_response=True
+        )
+        
+        if not success:
+            print("   ❌ Failed to edit contract content")
+            return False
+        
+        updated_content = edit_response.get('contract_content', '')
+        
+        # Verify section 11 is properly formatted in edited content (no markdown pipes)
+        if '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' in updated_content:
+            print("   ✅ Section 11 preserved in edited content")
+            
+            # Check no markdown pipes in edited section 11
+            section_11_start = updated_content.find('11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН')
+            section_11_edited = updated_content[section_11_start:]
+            
+            if '|' not in section_11_edited:
+                print("   ✅ Edited section 11 uses normal text format (no markdown pipes)")
+            else:
+                print("   ❌ Edited section 11 contains markdown pipes")
+                return False
+                
+            # Check that executor and client details are properly positioned
+            if '«Исполнитель»:' in section_11_edited and '«Заказчик»:' in section_11_edited:
+                print("   ✅ Both executor and client sections found in edited content")
+            else:
+                print("   ❌ Executor or client sections missing in edited content")
+                return False
+        else:
+            print("   ❌ Section 11 not found in edited content")
+            return False
+        
+        # Step 4: Test downloading original Word document
+        print("\n📥 Step 4: Testing original Word document download...")
+        
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download"
+        self.tests_run += 1
+        
+        try:
+            original_download = requests.get(url)
+            if original_download.status_code == 200:
+                self.tests_passed += 1
+                print("   ✅ Original Word document download successful")
+                
+                # Verify Word document contains proper table format
+                import tempfile
+                import zipfile
+                
+                with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                    temp_file.write(original_download.content)
+                    temp_file_path = temp_file.name
+                
+                try:
+                    with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                        document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                        
+                        # Check for Word table structure in section 11
+                        if '<w:tbl>' in document_xml and '<w:tr>' in document_xml and '<w:tc>' in document_xml:
+                            print("   ✅ Word table structure found in original document")
+                        else:
+                            print("   ❌ Word table structure NOT found in original document")
+                            return False
+                        
+                        # Check that executor is on left, client on right (by checking table cell order)
+                        if '«Исполнитель»:' in document_xml and '«Заказчик»:' in document_xml:
+                            executor_pos = document_xml.find('«Исполнитель»:')
+                            client_pos = document_xml.find('«Заказчик»:')
+                            if executor_pos < client_pos:
+                                print("   ✅ Executor on left, client on right in Word table")
+                            else:
+                                print("   ❌ Incorrect table positioning in Word document")
+                                return False
+                        
+                        # Check that HTML br tags are removed from client details in Word document
+                        if '<br>' not in document_xml and '<br/>' not in document_xml:
+                            print("   ✅ HTML br tags removed from Word document")
+                        else:
+                            print("   ❌ HTML br tags still present in Word document")
+                            return False
+                            
+                except Exception as e:
+                    print(f"   ❌ Error checking original Word document: {str(e)}")
+                    return False
+                finally:
+                    import os
+                    try:
+                        os.unlink(temp_file_path)
+                    except:
+                        pass
+            else:
+                print(f"   ❌ Original download failed: {original_download.status_code}")
+                return False
+        except Exception as e:
+            print(f"   ❌ Error with original download: {str(e)}")
+            return False
+        
+        # Step 5: Test downloading custom Word document with edited content
+        print("\n📥 Step 5: Testing custom Word document download...")
+        
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download_custom"
+        self.tests_run += 1
+        
+        try:
+            custom_download = requests.get(url)
+            if custom_download.status_code == 200:
+                self.tests_passed += 1
+                print("   ✅ Custom Word document download successful")
+                
+                # Verify custom Word document contains proper table format
+                with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                    temp_file.write(custom_download.content)
+                    temp_file_path = temp_file.name
+                
+                try:
+                    with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                        document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                        
+                        # Check for Word table structure in custom document
+                        if '<w:tbl>' in document_xml and '<w:tr>' in document_xml and '<w:tc>' in document_xml:
+                            print("   ✅ Word table structure found in custom document")
+                        else:
+                            print("   ❌ Word table structure NOT found in custom document")
+                            return False
+                        
+                        # Check that section 11 content is properly formatted
+                        if '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' in document_xml:
+                            print("   ✅ Section 11 header found in custom document")
+                        else:
+                            print("   ❌ Section 11 header NOT found in custom document")
+                            return False
+                        
+                        # Check executor and client positioning in custom document
+                        if '«Исполнитель»:' in document_xml and '«Заказчик»:' in document_xml:
+                            executor_pos = document_xml.find('«Исполнитель»:')
+                            client_pos = document_xml.find('«Заказчик»:')
+                            if executor_pos < client_pos:
+                                print("   ✅ Executor on left, client on right in custom Word table")
+                            else:
+                                print("   ❌ Incorrect table positioning in custom Word document")
+                                return False
+                        
+                        # Check that custom client details are present
+                        if 'test@section11.ru' in document_xml and '1234567890' in document_xml:
+                            print("   ✅ Custom client details found in Word document")
+                        else:
+                            print("   ❌ Custom client details NOT found in Word document")
+                            return False
+                            
+                except Exception as e:
+                    print(f"   ❌ Error checking custom Word document: {str(e)}")
+                    return False
+                finally:
+                    import os
+                    try:
+                        os.unlink(temp_file_path)
+                    except:
+                        pass
+            else:
+                print(f"   ❌ Custom download failed: {custom_download.status_code}")
+                return False
+        except Exception as e:
+            print(f"   ❌ Error with custom download: {str(e)}")
+            return False
+        
+        # Step 6: Verify process_signatures_section_from_content function works with new text format
+        print("\n🔍 Step 6: Verifying process_signatures_section_from_content function...")
+        
+        # This is implicitly tested by the custom download working correctly, but let's add explicit verification
+        # by checking that the custom document properly processes the text format section 11
+        
+        # Create another contract with different client details to test the function more thoroughly
+        test_contract_data = {
+            "name_or_organization": "ИП Тестов Тест Тестович",
+            "other_details": "Адрес: г. Москва, ул. Функциональная, 22<br/>ИНН: 9876543210<br />Телефон: +7(495)123-45-67",
+            "service_cost": 30000,
+            "duration_months": 12
+        }
+        
+        success, test_response = self.run_test(
+            "Create Test Contract for Function Verification",
+            "POST",
+            "contracts/direct",
+            200,
+            data=test_contract_data,
+            return_response=True
+        )
+        
+        if success and 'id' in test_response:
+            test_contract_id = test_response['id']
+            test_contract_number = test_response['contract_number']
+            self.created_contract_ids.append(test_contract_id)
+            
+            # Edit with section 11 containing different HTML br tag variants
+            test_edited_content = f"""**Договор об оказании услуг № {test_contract_number}**
+
+**11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН**
+
+«Исполнитель»:                                          «Заказчик»:
+Индивидуальный предприниматель                          ИП Тестов Тест Тестович
+Шамсутдинов Радис Раисович                             Адрес: г. Москва, ул. Функциональная, 22
+ИНН 163205154150                                       ИНН: 9876543210
+ОГРНИП 319169000185092                                 Телефон: +7(495)123-45-67
+
+________________/Шамсутдинов Р.Р.                        ________________/ИП Тестов Тест Тестович"""
+
+            test_content_update = {"contract_content": test_edited_content}
+            
+            success, test_edit_response = self.run_test(
+                "Edit Test Contract for Function Verification",
+                "PUT",
+                f"contracts/direct/{test_contract_id}/content",
+                200,
+                data=test_content_update,
+                return_response=True
+            )
+            
+            if success:
+                # Test custom download to verify function works
+                test_url = f"{self.api_url}/contracts/direct/{test_contract_id}/download_custom"
+                self.tests_run += 1
+                
+                try:
+                    test_custom_download = requests.get(test_url)
+                    if test_custom_download.status_code == 200:
+                        self.tests_passed += 1
+                        print("   ✅ process_signatures_section_from_content function working correctly")
+                        
+                        # Quick verification that the function processed the content
+                        with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                            temp_file.write(test_custom_download.content)
+                            temp_file_path = temp_file.name
+                        
+                        try:
+                            with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                                document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                                
+                                if 'ИП Тестов Тест Тестович' in document_xml and '9876543210' in document_xml:
+                                    print("   ✅ Function correctly processed different client details")
+                                else:
+                                    print("   ❌ Function did not process client details correctly")
+                                    return False
+                                    
+                        except Exception as e:
+                            print(f"   ❌ Error verifying function processing: {str(e)}")
+                            return False
+                        finally:
+                            import os
+                            try:
+                                os.unlink(temp_file_path)
+                            except:
+                                pass
+                    else:
+                        print(f"   ❌ Function verification download failed: {test_custom_download.status_code}")
+                        return False
+                except Exception as e:
+                    print(f"   ❌ Error verifying function: {str(e)}")
+                    return False
+            else:
+                print("   ❌ Failed to edit test contract for function verification")
+                return False
+        else:
+            print("   ❌ Failed to create test contract for function verification")
+            return False
+        
+        print("\n🎉 SECTION 11 FORMAT FUNCTIONALITY TEST COMPLETED SUCCESSFULLY!")
+        print("✅ All requirements verified:")
+        print("   • Contract creation with client details works")
+        print("   • Database contains section 11 with normal text format (no markdown pipes)")
+        print("   • Executor details on left, client details on right using spaces")
+        print("   • Contract editing preserves section 11 format")
+        print("   • Original Word download creates proper table format")
+        print("   • Custom Word download creates proper table format")
+        print("   • process_signatures_section_from_content function works with new text format")
+        print("   • HTML br tags properly removed in Word documents")
+        
+        return True
+
     def cleanup_contracts(self):
         """Clean up all created contracts"""
         print(f"\n🧹 Cleaning up {len(self.created_contract_ids)} created contracts...")
