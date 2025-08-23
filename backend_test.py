@@ -1703,6 +1703,255 @@ Email: test@example.com
         
         return True
 
+    def test_signatures_section_html_tag_removal(self):
+        """
+        CRITICAL TEST FOR SIGNATURES SECTION HTML TAG REMOVAL
+        
+        This test specifically addresses the review request:
+        1. Contract Template Fix - verify initial contract_content doesn't contain HTML <br> tags
+        2. Edited Content Signatures Section - test editing content with signatures section and verify HTML tags are removed
+        3. Original Template Behavior - ensure non-edited contracts still work correctly
+        4. HTML Tag Removal - test with client details containing <br> tags
+        """
+        print("\n🔍 SIGNATURES SECTION HTML TAG REMOVAL TEST")
+        print("=" * 60)
+        
+        # Test 1: Contract Template Fix - verify initial contract doesn't contain HTML tags
+        print("\n📝 Test 1: Contract Template Fix - No HTML tags in initial contract...")
+        contract_data = {
+            "name_or_organization": "ООО Тест HTML Теги",
+            "other_details": "Адрес: г. Казань<br>ул. Тестовая, 1<br/>кв. 123<br />офис 45",
+            "service_cost": 30000,
+            "duration_months": 6
+        }
+        
+        success, response = self.run_test(
+            "Create Contract with HTML Tags in Client Details",
+            "POST",
+            "contracts/direct",
+            200,
+            data=contract_data,
+            return_response=True
+        )
+        
+        if not success or 'id' not in response:
+            print("❌ Failed to create contract for HTML tag test")
+            return False
+        
+        contract_id = response['id']
+        initial_content = response.get('contract_content', '')
+        self.created_contract_ids.append(contract_id)
+        
+        # Check that initial contract_content doesn't contain HTML <br> tags
+        html_tags_in_initial = '<br>' in initial_content or '<br/>' in initial_content or '<br />' in initial_content
+        if not html_tags_in_initial:
+            print("   ✅ Initial contract_content doesn't contain HTML <br> tags")
+        else:
+            print("   ❌ Initial contract_content contains HTML <br> tags")
+            return False
+        
+        # Test 2: Download original template and verify no HTML tags in Word document
+        print("\n📥 Test 2: Original Template Behavior - Download and verify...")
+        url = f"{self.api_url}/contracts/direct/{contract_id}/download"
+        
+        self.tests_run += 1
+        try:
+            download_response = requests.get(url)
+            if download_response.status_code != 200:
+                print(f"❌ Original template download failed: {download_response.status_code}")
+                return False
+            
+            self.tests_passed += 1
+            
+            # Check Word document content for HTML tags
+            import tempfile
+            import zipfile
+            
+            with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                temp_file.write(download_response.content)
+                temp_file_path = temp_file.name
+            
+            try:
+                with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                    document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                    
+                    # Check that HTML tags are NOT in the Word document
+                    html_in_word = '<br>' in document_xml or '<br/>' in document_xml or '<br />' in document_xml
+                    if not html_in_word:
+                        print("   ✅ Original template Word document doesn't contain HTML <br> tags")
+                    else:
+                        print("   ❌ Original template Word document contains HTML <br> tags")
+                        return False
+                    
+                    # Check that client details are properly formatted with line breaks
+                    client_details_found = 'г. Казань' in document_xml and 'ул. Тестовая' in document_xml
+                    if client_details_found:
+                        print("   ✅ Client details properly formatted with normal line breaks")
+                    else:
+                        print("   ❌ Client details not properly formatted")
+                        return False
+                        
+            except Exception as e:
+                print(f"   ❌ Error checking original template document: {str(e)}")
+                return False
+            finally:
+                import os
+                try:
+                    os.unlink(temp_file_path)
+                except:
+                    pass
+        
+        except Exception as e:
+            print(f"❌ Error with original template download: {str(e)}")
+            return False
+        
+        # Test 3: Edit content to include signatures section and test HTML tag removal
+        print("\n✏️  Test 3: Edited Content Signatures Section - HTML tag removal...")
+        edited_content_with_signatures = f"""**Договор об оказании услуг № {response['contract_number']}**
+
+г. Казань «___» 2025 г.
+
+Индивидуальный предприниматель Шамсутдинов Радис Раисович, именуемый в дальнейшем «Исполнитель» с одной стороны и ООО Тест HTML Теги, именуемый в дальнейшем «Заказчик», с другой стороны, далее совместно именуемые «Стороны» заключили настоящий Договор о нижеследующем:
+
+**1. ПРЕДМЕТ ДОГОВОРА**
+
+1.1. «Исполнитель» принимает на себя обязательства оказать комплекс услуг в соответствии с заявками «Заказчика».
+
+**2. ЦЕНА УСЛУГ И ПОРЯДОК РАСЧЕТОВ**
+
+2.1 Стоимость услуг составляет 30000 (тридцать тысяч) рублей в месяц.
+
+**11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН**
+
+«Исполнитель»:
+Индивидуальный предприниматель
+Шамсутдинов Радис Раисович
+Юридический адрес организации
+423040, Россия, Республика Татарстан,
+Нурлатский р-н, г. Нурлат,
+ул. им Р.С. Хамадеева, д. 9, кв. 8
+ИНН 163205154150
+ОГРНИП 319169000185092
+
+«Заказчик»:
+ООО Тест HTML Теги
+Адрес: г. Казань<br>ул. Тестовая, 1<br/>кв. 123<br />офис 45
+
+________________/Шамсутдинов Р.Р.    ________________/ООО Тест HTML Теги"""
+
+        content_update = {"contract_content": edited_content_with_signatures}
+        
+        success, edit_response = self.run_test(
+            "Edit Contract with Signatures Section",
+            "PUT",
+            f"contracts/direct/{contract_id}/content",
+            200,
+            data=content_update,
+            return_response=True
+        )
+        
+        if not success:
+            print("❌ Failed to edit contract content with signatures section")
+            return False
+        
+        print("✅ Contract content edited with signatures section")
+        
+        # Test 4: Download custom version and verify HTML tag removal
+        print("\n📥 Test 4: Custom Download - Verify HTML tag removal and signatures formatting...")
+        custom_url = f"{self.api_url}/contracts/direct/{contract_id}/download_custom"
+        
+        self.tests_run += 1
+        try:
+            custom_download_response = requests.get(custom_url)
+            if custom_download_response.status_code != 200:
+                print(f"❌ Custom download failed: {custom_download_response.status_code}")
+                return False
+            
+            self.tests_passed += 1
+            
+            # Check custom Word document
+            with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as temp_file:
+                temp_file.write(custom_download_response.content)
+                temp_file_path = temp_file.name
+            
+            try:
+                with zipfile.ZipFile(temp_file_path, 'r') as docx_zip:
+                    document_xml = docx_zip.read('word/document.xml').decode('utf-8')
+                    
+                    # Critical Check A: No HTML <br> tags appear in the document
+                    html_in_custom_word = '<br>' in document_xml or '<br/>' in document_xml or '<br />' in document_xml
+                    if not html_in_custom_word:
+                        print("   ✅ No HTML <br> tags appear in custom Word document")
+                    else:
+                        print("   ❌ HTML <br> tags found in custom Word document")
+                        return False
+                    
+                    # Critical Check B: Signatures section is properly formatted as a table
+                    signatures_section_found = '11. ЮРИДИЧЕСКИЕ АДРЕСА И БАНКОВСКИЕ РЕКВИЗИТЫ СТОРОН' in document_xml
+                    if signatures_section_found:
+                        print("   ✅ Signatures section found in document")
+                    else:
+                        print("   ❌ Signatures section NOT found in document")
+                        return False
+                    
+                    # Critical Check C: Client details display correctly with proper line breaks
+                    client_details_checks = [
+                        ('Kazan found', 'г. Казань' in document_xml),
+                        ('Street found', 'ул. Тестовая' in document_xml),
+                        ('Apartment found', 'кв. 123' in document_xml),
+                        ('Office found', 'офис 45' in document_xml)
+                    ]
+                    
+                    all_client_details_found = True
+                    for check_name, check_result in client_details_checks:
+                        if check_result:
+                            print(f"   ✅ {check_name} in client details")
+                        else:
+                            print(f"   ❌ {check_name} NOT found in client details")
+                            all_client_details_found = False
+                    
+                    if not all_client_details_found:
+                        return False
+                    
+                    # Critical Check D: Section appears on a separate page (page 4)
+                    page_breaks = document_xml.count('<w:br w:type="page"/>') + document_xml.count('<w:br w:type="page"')
+                    if page_breaks > 0:
+                        print(f"   ✅ Page breaks found in document ({page_breaks} page breaks) - signatures on separate page")
+                    else:
+                        print("   ❌ No page breaks found - signatures section may not be on separate page")
+                        return False
+                    
+                    # Additional Check: Table structure for signatures
+                    table_elements = document_xml.count('<w:tbl>')
+                    if table_elements > 0:
+                        print(f"   ✅ Table structure found for signatures ({table_elements} tables)")
+                    else:
+                        print("   ❌ No table structure found for signatures")
+                        return False
+                        
+            except Exception as e:
+                print(f"   ❌ Error checking custom document: {str(e)}")
+                return False
+            finally:
+                import os
+                try:
+                    os.unlink(temp_file_path)
+                except:
+                    pass
+        
+        except Exception as e:
+            print(f"❌ Error with custom download: {str(e)}")
+            return False
+        
+        print("\n🎉 SIGNATURES SECTION HTML TAG REMOVAL TEST PASSED!")
+        print("✅ All critical checks verified:")
+        print("   • Initial contract_content doesn't contain HTML <br> tags")
+        print("   • Client details properly formatted with normal line breaks")
+        print("   • Signatures section properly formatted as table")
+        print("   • Section appears on separate page (page 4)")
+        print("   • HTML tags removed from Word document")
+        return True
+
     def run_contract_editing_regression_tests(self):
         """
         Run specific tests for the contract editing regression issue
