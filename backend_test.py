@@ -1685,6 +1685,53 @@ Email: test@example.com
         
         return True
 
+    def run_contract_editing_regression_tests(self):
+        """
+        Run specific tests for the contract editing regression issue
+        Focus on document structure preservation and download functionality
+        """
+        print("\n" + "="*80)
+        print("🚨 RUNNING CONTRACT EDITING REGRESSION TESTS")
+        print("   Testing fix for document structure preservation issue")
+        print("="*80)
+        
+        tests = [
+            ("Document Structure Preservation", self.test_document_structure_preservation),
+            ("Contract Content Editing Workflow", self.test_contract_content_editing_workflow),
+            ("Contract Content Editing", self.test_contract_content_editing),
+            ("Custom Contract Download", self.test_custom_contract_download),
+        ]
+        
+        regression_tests_passed = 0
+        regression_tests_total = len(tests)
+        
+        for test_name, test_method in tests:
+            print(f"\n{'='*60}")
+            print(f"🧪 REGRESSION TEST: {test_name}")
+            print(f"{'='*60}")
+            
+            try:
+                if test_method():
+                    regression_tests_passed += 1
+                    print(f"✅ REGRESSION TEST PASSED: {test_name}")
+                else:
+                    print(f"❌ REGRESSION TEST FAILED: {test_name}")
+            except Exception as e:
+                print(f"❌ REGRESSION TEST ERROR: {test_name} - {str(e)}")
+        
+        print(f"\n{'='*80}")
+        print(f"📊 REGRESSION TEST RESULTS")
+        print(f"{'='*80}")
+        print(f"Tests Passed: {regression_tests_passed}/{regression_tests_total}")
+        print(f"Success Rate: {(regression_tests_passed/regression_tests_total)*100:.1f}%")
+        
+        if regression_tests_passed == regression_tests_total:
+            print("🎉 ALL REGRESSION TESTS PASSED - Issue appears to be resolved!")
+        else:
+            print("⚠️  SOME REGRESSION TESTS FAILED - Issue may still exist")
+        
+        return regression_tests_passed == regression_tests_total
+
     def cleanup_contracts(self):
         """Clean up all created contracts"""
         print(f"\n🧹 Cleaning up {len(self.created_contract_ids)} created contracts...")
